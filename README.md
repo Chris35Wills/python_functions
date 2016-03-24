@@ -1,2 +1,3 @@
 # python_functions
-My personal library of sueful day-to-day python functions
+
+My personal library of useful day-to-day python functions
