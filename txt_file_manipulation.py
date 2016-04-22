@@ -157,7 +157,7 @@ def strip_duplicates(in_file, out_file, sep_type="", header_rows=0):
     len_dup_False_indx=len(dup_False[0])
 
     try:
-        assert len_no_dup == len_dup_indx
+        assert len_no_dup == len_dup_False_indx
     except AssertionError:
   	print("Removal of duplicates and creation of new output failed.")
 	print("Length of no duplicated indices does not match the subsampled main dataframe... fucntion failiure :(")
@@ -169,8 +169,9 @@ def strip_duplicates(in_file, out_file, sep_type="", header_rows=0):
 
     if sep_type=="":
 	no_dup.to_csv(out_file, sep="\t", header=False, index=False)
+	print("Duplicates removed - output file: %s" %(out_file))
     else:
  	no_dup.to_csv(out_file, sep=sep_type, header=False, index=False)
-
+        print("Duplicates removed - output file: %s" %(out_file))
 
 		
