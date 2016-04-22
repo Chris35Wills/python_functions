@@ -7,6 +7,7 @@ from osgeo.gdalconst import *
 
 import util
 import numpy as np
+import matplotlib.pyplot as plt
 
 # NB/ The geotransorm contains the following:
 # geotransform[0] /* top left x */
@@ -502,3 +503,159 @@ def tiff_from_array(file_out, image_array, cols, rows):
 	outband.WriteArray(image_array)
 
 	print "Output tiff created: ", file_out
+
+def subset_raster_to_extent_of_other(src_filename, match_filename, dst_filename):
+	"""
+	Takes in 2 rasters - one that needs clipping (src_filename) and another (match_filename).
+	You will be clipping src_filename to the extent and post size of match_filename
+
+	Also, pass in a path and filename to define where to keep your output.
+
+	RETURN: nothing
+
+	Modified from this post: http://stackoverflow.com/questions/10454316/how-to-project-and-resample-a-grid-to-match-another-grid-with-gdal-python
+	@date 24/03/16
+	"""
+
+	# Source
+	src = gdal.Open(src_filename, gdalconst.GA_ReadOnly)
+	src_proj = src.GetProjection()
+	src_geotrans = src.GetGeoTransform()
+
+	# We want a section of source that matches this:
+	match_ds = gdal.Open(match_filename, gdalconst.GA_ReadOnly)
+	match_proj = match_ds.GetProjection()
+	match_geotrans = match_ds.GetGeoTransform()
+	wide = match_ds.RasterXSize
+	high = match_ds.RasterYSize
+
+	# Output / destination
+	dst = gdal.GetDriverByName('GTiff').Create(dst_filename, wide, high, 1, gdalconst.GDT_Float32)
+	dst.SetGeoTransform( match_geotrans )
+	dst.SetProjection( match_proj)
+
+	# Do the work
+	gdal.ReprojectImage(src, dst, src_proj, match_proj, gdalconst.GRA_Bilinear)
+
+	del dst # Flush
+
+
+	
+
+def xy_mesh(nx, ny, x_min=0, x_max=1, y_min=0, y_max=1):
+	"""
+	Creates a mesh grid of an input array
+	VARIABLES
+		nx      array columns 
+		ny      array rows
+	
+	RETURN
+		xv		x coordinate mesh of same dimensions as array
+		yv		y coordinate mesh of same dimensions as array
+	"""
+
+	x = np.linspace(x_min, x_max, nx)
+	y = np.linspace(y_min, y_max, ny)
+	xv, yv = np.meshgrid(x, y)
+	
+	return xv, yv
+
+def raster_cell_centres_as_xy(extent, raster_cols, raster_rows, raster_post, plot=0):
+	"""
+	"""
+	# These max/min extent values are for the corners  of the raster
+	# Half of the post is subtracted to get the coordinates at the centre 
+	# of the corner cells
+	xmin=extent[0]+np.round(raster_post)/2
+	xmax=extent[1]-np.round(raster_post)/2
+	ymin=extent[2]+np.round(raster_post)/2
+	ymax=extent[3]-np.round(raster_post)/2
+
+	xv, yv = xy_mesh(raster_cols, raster_rows, \
+					 xmin, xmax, ymin, ymax)
+
+	if plot==1:
+		fig=plt.figure()
+		ax1=fig.add_subplot(121)
+		ax2=fig.add_subplot(122)
+		ax1.imshow(xv, extent=[xmin, xmax, xmin, xmax]), ax1.set_title("x grid"), ax1.set_yticklabels("")
+		ax2.imshow(yv, extent=[ymin, ymax, ymin, ymax]), ax2.set_title("y grid"), ax2.set_xticklabels("")
+		plt.show()
+
+	return xv, yv
+
+
+	# loop through xvm, yv and raster and for each node, extract the x, y and z values - write to a csv
+
+def xyz_from_grid(x,y,z, pnts_out):
+	"""
+	Takes in three grids of the same dimension (e.g. x, y and z) and 
+	writes out their values as a csv in the format x,y,z. The x and y 
+	grids can be created using raster_cell_centres_as_xy().
+
+	RETURN:
+		nothing
+	"""
+	x_flt=x.flatten()
+	y_flt=y.flatten()[::-1]
+	z_flt=z.flatten()
+
+	util.check_output_dir(pnts_out)
+	fout = open(pnts_out, 'w')
+	fout.write("x,y,z\n")
+
+	print("Writing out %i xyz triples to %s" %(len(z_flt),pnts_out))
+	for i in range(0, len(z_flt)):
+		if not np.isnan(z_flt[i]):
+			fout.write("%.6f,%.6f,%.2f\n" %(x_flt[i], y_flt[i], z_flt[i]))
+
+	fout.close()
+
+def tiff_from_2d_array(original_dataset, file_out, post, image_array):
+	'''
+	Converts a numpy array back to a tiff.
+
+	Pass in a rasterdatset object (i.e. your array to write will match the geotransform of an 
+	existing raster dataset).
+
+	The post variable allwos for resampling of your new array, and modification of a copy of the 
+	geotransform of the exisiting original dataset you pass in.
+
+	Returns:
+		Nothing
+	
+	'''
+	driver = gdal.GetDriverByName('GTIFF') ## Seems to work better if you use the driver that you originally read in 'image_array' with...
+	driver.Register()
+	
+	inDs = original_dataset
+	original_geotransform = inDs.GetGeoTransform()
+
+	rows, cols = image_array.shape
+	bands = 1
+
+	# Creates a new raster data source
+	outDs = driver.Create(file_out, cols, rows, bands, gdal.GDT_Float32)
+	
+	# Write metadata
+	originX = original_geotransform[0]
+	originY = original_geotransform[3]
+
+	outDs.SetGeoTransform([originX, post, 0.0, originY, 0.0, -post])
+	outDs.SetProjection(inDs.GetProjection())
+
+	#Write raster datasets
+	outBand = outDs.GetRasterBand(1)
+	outBand.WriteArray(image_array)
+	
+	new_geotransform = outDs.GetGeoTransform()
+	new_projection = outDs.GetProjection()
+	
+	print "Output binary saved: ", file_out
+	
+	#return new_geotransform,new_projection,file_out
+
+if __name__  == "__main__":
+
+	print("Various raster related geoprocessing fucntions.")
+	print("Must be run from import.")

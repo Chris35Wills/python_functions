@@ -14,6 +14,7 @@ def trim_constant_rows_cols(img):
 	img_no_zeros = img_goodrows[:, np.std(img_goodrows, 0) != 0]
 	return img_no_zeros
 
+
 def check_output_dir(filename):
 	'''
 	Checks if the designated directory name exists, creating it if it doesn't
@@ -23,6 +24,18 @@ def check_output_dir(filename):
 		print "%s DOESN'T exist...\n" % dirname
 		os.makedirs(dirname) 
 		print "...but it does now"
+
+
+def check_if_empty(file_in):
+	size=os.path.getsize(file_in)
+	if size == 0:
+		print("%s is empty" %file_in)
+		empty=True
+	else:
+		empty=False
+
+	return empty
+
 
 def live_view_z(img):
 	'''
@@ -44,6 +57,7 @@ def live_view_z(img):
 		else:
 			return  'x=%1.4f, y=%1.4f' %(x,y)
 	return format_coord
+
 
 def live_view_z_extent(img, extent):
 	'''

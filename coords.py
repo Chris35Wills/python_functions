@@ -1,14 +1,76 @@
 '''
-Gridding functions
+Various coordinate and gridding related functions
 
-These work mainly for projected coordinate systems
-
-Chris 17/03/15
+@author: Chris Williams
+@date  : 17/03/15 onwards...
 '''
 
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
+import mpl_toolkits.basemap.pyproj as pyproj
+
+def warp_xyz(xyz, inprj, outprj):
+	"""
+
+	Changes coordinates of an input xyz dataset from those specified by inproj to outprj.
+
+	VARIABLES
+
+	xyz    - xyz columns
+	inprj  - input projection (proj4 syntax / epsg code)
+	outprj - output projection (proj4 syntax / epsg code)
+
+	RETURNS
+
+	xyz_out - numpy array of warped xyz values
+
+	EXAMPLE
+	
+	#set paths
+	path="O:/Documents/CHRIS_Bristol/Lamont_BATHYMETRY/new_data_2016"
+
+	in_f="%s/IGBTH4_20150126_labelled.csv" %(path)
+	out_f="%s/IGBTH4_20150126_bamber_XYZ.csv" %path
+	#in_f="%s/IGBTH4_20141008_labelled.csv" %(path)
+	#out_f="%s/IGBTH4_20141008_bamber_XYZ.csv" %path
+	#in_f="%s/IGBTH4_20140207_labelled.csv" %(path)
+	#out_f="%s/IGBTH4_20140207_bamber_XYZ.csv" %path
+
+	#read in data
+	data=np.genfromtxt(in_f, skiprows=1,delimiter=',')
+	lon=data[:,3]
+	lat=data[:,4]
+	z=data[:,5]
+	xyz=np.array((lon, lat, z)).transpose()
+
+	#warp
+	wgs84 = "+init=EPSG:4326" # LatLon with WGS84 datum 
+	bamb  = "+proj=stere +lat_0=90 +lat_ts=71 +lon_0=-39 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs" # bamber polar stereo
+	xyz_out, xyz_out_transp = warp_xyz(xyz, wgs84, bamb)
+
+	# write data out
+	np.savetxt(out_f, xyz_out_transp, delimiter=",", header="x_bamb, y_bamb, z", comments='')
+	print("Coordinate transformation COMPLETE")
+	print("Input was: %s" %(in_f))
+	print("Outputs is: %s" %(out_f))
+
+	"""
+
+	inprj=pyproj.Proj(inprj)
+	outprj=pyproj.Proj(outprj) 
+
+	x_in = xyz[:,0]
+	y_in = xyz[:,1]
+	z    = xyz[:,2]
+
+	x_out,y_out=pyproj.transform(inprj, outprj, x_in, y_in)
+
+	xyz_out=np.array((x_out,y_out,z))
+	xyz_out_transp=np.array((x_out,y_out,z)).transpose() # transposed
+
+	return xyz_out, xyz_out_transp
+
 
 def corners(top_left_x, top_left_y, post, cols, rows):
 	'''
