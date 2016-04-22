@@ -67,6 +67,7 @@ def check_date_range(data, date_column, sep_type="", skip_rows=0, date_format="j
     print("Earliest year record: %f" %(years.min()))
     print("Latest year record: %f" %(years.max()))
 
+
 def read_header(in_file, num_header_rows, sep_type =""):
 	"""
 	Reads in the header rows of a text file.
@@ -92,9 +93,38 @@ def read_header(in_file, num_header_rows, sep_type =""):
 	return header
 
 
-def strip_duplicates(in_file, out_file, date_column, sep_type="", header_rows=0):
+def check_duplicates(in_file, sep_type="", header_rows=0):
 	"""
-	Read in text file and output new version of the file without duplicates (retaining only the first instance)
+	Checks for duplicated rows in a given file.
+	
+	VARIABLES
+	in_file				= a text file
+	sep_type			= separator type (defaults to white space delimited)
+	header_rows         = number of header rows to skip (defaults to zero i.e. no header)
+	
+	RETURNS
+
+	Nothing
+	"""
+
+	if sep_type=="":
+	    data=pd.read_csv(in_file, skiprows=header_rows, header=None, delim_whitespace=True) 
+	else:
+	    data=pd.read_csv(in_file, skiprows=header_rows, header=None, sep=sep_type)
+
+	dup=data.duplicated(keep='first')
+	dup_TRUE=np.where(dup==TRUE)
+	len_dup_TRUE_indx=len(dup_TRUE[0])
+
+	if len_dup_False_indx == 0:
+		print("No duplicated rows in %s" %(in_file))
+	else:	
+		print("%i duplicated rows found in %s" %(len_dup_TRUE_indx, in_file))
+
+
+def strip_duplicates(in_file, out_file, sep_type="", header_rows=0):
+	"""
+	Read in text file and output new version of the file without duplicates (retaining only the first instance).
 
 	VARIABLES
 
@@ -110,15 +140,12 @@ def strip_duplicates(in_file, out_file, date_column, sep_type="", header_rows=0)
 
 	util.check_output_dir(out_file)
 
-	##get header... <<<<<<<<<<<<<<<<<<<<<<<
 	if header_rows !=0: header=read_header(in_file, num_header_rows=header_rows, sep_type ="")
 
 	if sep_type=="":
 	    data=pd.read_csv(in_file, skiprows=header_rows, header=None, delim_whitespace=True) 
 	else:
 	    data=pd.read_csv(in_file, skiprows=header_rows, header=None, sep=sep_type)
-
-	#data=pd.read_csv('GOG2012_las_srfelv_xyz_noHead.txt', delim_whitespace=True, header=None)
 
 	dup=data.duplicated(keep='first')
 	dup_False=np.where(dup==False)
