@@ -584,8 +584,54 @@ def raster_cell_centres_as_xy(extent, raster_cols, raster_rows, raster_post, plo
 
 	return xv, yv
 
+def xyz_triple(xv, yv, zv):
+	"""
+	Takes in three grids of the same dimension (e.g. x, y and z) and formats 
+	them as a nx3 array (where n is the number of triplets/observations/locations)
 
-	# loop through xvm, yv and raster and for each node, extract the x, y and z values - write to a csv
+	VARIABLES 
+
+	xv 	- 	xv can be created using raster_cell_centres_as_xy 
+	yv	-	yv can be created using raster_cell_centres_as_xy 
+	zv	-	the n-dimensional array of the raster you should have already read in.
+
+	RETRUN
+
+	raster_xyz
+	"""
+	try:
+		assert xv.shape == yv.shape
+	except AssertionError:
+		print("xv and yv not of equal diomensions")
+
+	try:
+		assert xv.shape == zv.shape
+	except AssertionError:
+		print("zv not of the same dimensions as xv and yv")
+	
+	raster_xyz=np.vstack([raster_x.flatten(),raster_y.flatten(),raster_z.flatten()]).transpose()
+
+	return raster_xyz
+
+def xyz_triples_as_pandas_df(numpy_xyz):
+	"""
+	Takes in an nx3 numpy array representing an xyz triplet array and convert it to a pandas dataframe
+
+	VARIABLES
+
+	numpy_xyz 	an nx3 numpy array representing an xyz triplet array (create using xyz_triple)
+
+	RETURN
+
+	xyz_df	
+	"""
+		
+	raster_indx=np.arange(0, raster_xyz.shape[0])
+	xyz_df =  pd.DataFrame(raster_xyz, index=indx, names=["x","y","z"])
+	df.columns = ['x','y','z']
+
+	return xyz_df
+
 
 def xyz_from_grid(x,y,z, pnts_out):
 	"""
