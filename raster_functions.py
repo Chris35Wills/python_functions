@@ -6,7 +6,9 @@ from osgeo import gdal, gdalconst, osr
 from osgeo.gdalconst import * 
 
 import util
+
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 # NB/ The geotransorm contains the following:
@@ -609,11 +611,12 @@ def xyz_triple(xv, yv, zv):
 	except AssertionError:
 		print("zv not of the same dimensions as xv and yv")
 	
-	raster_xyz=np.vstack([raster_x.flatten(),raster_y.flatten(),raster_z.flatten()]).transpose()
+	raster_xyz=np.vstack([xv.flatten(),yv.flatten(),zv.flatten()]).transpose()
 
 	return raster_xyz
 
-def xyz_triples_as_pandas_df(numpy_xyz):
+
+def xyz_triple_as_pandas_df(numpy_xyz):
 	"""
 	Takes in an nx3 numpy array representing an xyz triplet array and convert it to a pandas dataframe
 
@@ -626,9 +629,9 @@ def xyz_triples_as_pandas_df(numpy_xyz):
 	xyz_df	
 	"""
 		
-	raster_indx=np.arange(0, raster_xyz.shape[0])
-	xyz_df =  pd.DataFrame(raster_xyz, index=indx, names=["x","y","z"])
-	df.columns = ['x','y','z']
+	indx=np.arange(0, numpy_xyz.shape[0])
+	xyz_df = pd.DataFrame(numpy_xyz, index=indx)
+	xyz_df.columns = ['x','y','z']
 
 	return xyz_df
 

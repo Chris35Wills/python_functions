@@ -79,3 +79,30 @@ def grid_extent_labels(data, tl_x, tl_y, post, cols, rows, x_interval=200000,y_i
 	ytick_interval = np.arange(0, y, y/tick_num_y) # tick_num changes how many ticks you want...
 
 	return [xtick_interval, xtick_labels],[ytick_interval, ytick_labels]
+
+def points_to_avg_grid():
+
+	#http://stackoverflow.com/questions/26971526/rebin-irregularly-gridded-data-to-regular-2d-grid-in-python-using-mean-median
+	#create observation density grid at the same time :)
+
+def points_to_grid_linear_interp():
+	############################################################
+	### XYZ land mask points
+	############################################################
+
+	grid_1km="O:/Documents/CHRIS_Bristol/Gridding/trial/land_1km.txt"
+	post = 1000
+	df_lnd = pd.read_csv(grid_1km, sep = "\s*", skiprows=5, header=None, names=['x','y','z']) 
+	x_lnd = df['x'].values
+	y_lnd = df['y'].values
+	z_lnd = df['z'].values
+
+	##Mesh Grid
+	xi_lnd = np.linspace(min(x_lnd), max(x_lnd), post)
+	yi_lnd = np.linspace(min(y_lnd), max(y_lnd), post)
+	Y_lnd, X_lnd = np.meshgrid(yi, xi,indexing='ij')
+
+	##Grid data (using linear interpolation)
+	#Z = ml.griddata(x, y, z, xi, yi, interp='linear')
+	Z_lnd = ml.griddata(x_lnd, y_lnd, z_lnd, xi_lnd, yi_lnd)
+	plt.imshow(Z_lnd, origin='lower'), plt.colorbar(), plt.show()
