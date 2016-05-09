@@ -69,6 +69,30 @@ def check_date_range(data, date_column, sep_type="", skip_rows=0, date_format="j
     print("Earliest year record: %f" %(years.min()))
     print("Latest year record: %f" %(years.max()))
 
+def column_max_min(data, column, sep_type="", skip_rows=0):
+    """
+    Reads in a text file and returns the max and min values for a specifed column.
+
+    VARIABLES
+    
+    data     = a text file
+    column   = the column to analyse
+    sep_type     = separator type (defaults to white space delimited)
+    skip_rows    = number of header rows to skip (defaults to zero)
+    
+    RETURNS
+
+    Nothing
+    """
+
+    if sep_type=="":
+        info=pd.read_csv(data, skiprows=skip_rows, header=None, delim_whitespace=True) 
+    else:
+        info=pd.read_csv(data, skiprows=skip_rows, header=None, sep=sep_type)
+
+    print("Min: %f" %(info[column].min()))
+    print("Max: %f" %(info[column].max()))
+
 
 def read_header(in_file, num_header_rows, sep_type =""):
     """
