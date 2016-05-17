@@ -9,6 +9,35 @@ import matplotlib.pyplot as plt
 
 import tests
 
+#############
+# Quick tests
+
+def test_space_space_wavelength(sample_spacing, min_xf_space_space):
+	"""
+	For conversion of k space back to space space, the minimum converted value (min_xf_space_space) 
+	cannot be less than the initial sample spacing.
+
+	VARIABLES
+	min_xf_space_space
+	sample_spacing
+	"""
+	try:
+		assert min_xf_space_space < sample_spacing
+	except AssertionError:
+		sys.exit("Sample spacing is greater than k value converted back to space space ")
+
+def test_length_equality(x,y):
+	"""Assertion test of the length of 2 arrays"""
+	try:
+		assert len(x) == len(y)
+	except AssertionError:
+		print("Length of x: %i" %len(x))
+		print("Length of y: %i" %len(y))
+		sys.exit("x and y vectors are of different length")
+
+################
+# Main functions
+
 def map_k_from_x(x, sample_spacing, return_x_units=False, n=''):
 	"""
 	Maps k in frequency space from x in space space.
@@ -35,17 +64,13 @@ def map_k_from_x(x, sample_spacing, return_x_units=False, n=''):
 	*if plotting an ft against xf_units, the x axis will have the shortest 
 	wavelengths (highest frequencies) closest to the origin)
 	"""
-	print n
-
+	
 	# if no number of elements set, just take half of the length of x (the Nyqvist frequency)
 	if n == '': 
 		N=len(x)
 		#xf = np.linspace(x_min, 1.0/(2.0*sample_spacing), N/2) # start vector at x_min - defaults to 0 if not set
 		#xf = np.linspace(x[0], 1.0/(2.0*sample_spacing), N/2) # start vector at first element of x
 		xf = np.linspace(0.0, 1.0/(2.0*sample_spacing), N/2)  # start vector at 0
-
-		print("linearly spaced x array:")
-		print(xf)
 		
 	# if a number of elements set (n), create n elements in xf
 	else:
@@ -56,17 +81,17 @@ def map_k_from_x(x, sample_spacing, return_x_units=False, n=''):
 														   # nyquist frequency which has a value of half the input points
 		
 	if not return_x_units:
-		print("Just returning linearly spaced array in frequency units (1/x units)")
+		#print("Just returning linearly spaced array in frequency units (1/x units)")
 		return xf
 
 	elif return_x_units:
 		
-		print("Returning linearly spaced array in frequency units (1/x units) and space space units (units of input x vector)")
+		#print("Returning linearly spaced array in frequency units (1/x units) and space space units (units of input x vector)")
 		xf_units=(1/xf)/2 # 1/2*sample_spacing is used to convert from space space to k space, cutting off at the 
 						  # nyquist frequency which has a value of half the input points
 		return xf, xf_xunits
 
-def frequency_plot(fft_1d_snip, ax, skip_first_value=True, x_label="", y_label=""):
+def frequency_plot(fft_1d_snip, ax, skip_first_value=True, x_label="", y_label="", log=False):
 	"""
 	Plots a 1d FFT (pass in the absolute number rather than real+imaginery pair)
 
@@ -89,12 +114,13 @@ def frequency_plot(fft_1d_snip, ax, skip_first_value=True, x_label="", y_label="
 		x=np.linspace(1, len(fft_1d_snip[1:]), len(fft_1d_snip[1:]))
 		y=fft_1d_snip[1:]
 
-		print(len(x))
-		print(len(y))
-		
 		tests.test_length_equality(x,y)
 
-		ax.plot(x,y) 
+		if log:
+			ax.plot(x,np.log(y)) 
+		elif not log:
+			ax.plot(x,y) 
+
 		ax.set_xlim(0, len(fft_1d_snip[1:])+1) # removed as diff length...
 
 	else: 
@@ -103,34 +129,133 @@ def frequency_plot(fft_1d_snip, ax, skip_first_value=True, x_label="", y_label="
 	
 	return x_label, y_label, plot_type, ax
 	
-"""
-# plot wavelengths (nb/  in pixels)
-def wavelength_plot (wavelengths,fft_1d_snip):
-	x_label = 'Wavelength'
-	y_label = 'Magnitude'
-	plot_type = "freq_vs_wavelengths"
-	ax.plot(wavelengths,fft_1d_snip) 
-	return x_label, y_label, plot_type, ax
-	
-def magnitude_metres(fft_1d_snip, array_length):
-	mag_m = fft_1d_snip/math.sqrt(array_length)
-	return mag_m
-	
-def wavelength_metres(pixel_size, wavelengths):
-	wavelength_m = wavelengths*pixel_size
-	return wavelength_m
+def plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing,n='', ax='', log=False):
+	"""
+	Plots the results of an ft in frequency space (1/units of original input (x)) (FREQUENCY space)
 
-def FFT_plot(site, ax, transect_number, plot_type, output_path, x_label, y_label, magnitude_units='px', wavelength_units='px'):
-	#plt.clf()
-	time_stamp = strftime("%H.%M.%S")
-	name = "%s_transect_%i_%s_%s.pdf" %(site, transect_number, plot_type, time_stamp) 
-	#ax.set_title("Helheim_transect_%i_FFT" %(transect_number))
-	output_name = "%s/%s" %(output_path, name)
-	plt.xlabel("%s (%s)" %(x_label, wavelength_units))
-	plt.ylabel("%s (%s)" %(y_label, magnitude_units))
-	#plt.savefig(output_name) 
-	plt.show()
-"""
+	e.g.
+
+	x is 500 m -> 5000 m   (perhaps distance along a transect)
+	y is -1000 m -> +200 m (perhaps bathymetric elevation)
+
+	your plot will be log(FT mgnitude) vs wavelength in m
+
+	Remember, if you have x/y data where x is 500 m - 5000 m and y is -1000m - +200m, 
+	your FT v swavelength (m) plot will start at your step size and not at the min value 
+	of your input x axis as it illustrates wavelengths in x units, not location! This may 
+	seem basic, but I spent 3 hours trying to get my head around that.
+
+	VARIABLES
+	fft_1d_clip      : absolute component of an ft - must be same length as x_clip
+	x_clip           : x axis - such as distance along a transect
+	sample_spacing   : sample spacing between x axis values
+	ax               : axis object - if none passed, function just shows plot
+
+	RETURN
+	"""
+
+	tests.test_length_equality(fft_1d_clip, x_clip)
+
+	if ax == '':
+		ax_mod=False
+		print("No axis object passed so creating figure")
+		fig=plt.figure()
+		ax=fig.add_subplot(111)
+	else:
+		ax_mod=True
+		print("Axis object passed so modifying object")
+
+	# calculate k from x 	
+	xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip))
+
+	#plot ft against frequency (1/m)
+	#ax2.plot(xf, np.log(fft_1d[:len(fft_1d)/2]))
+	if log:
+		ax.plot(xf[1:], np.log(fft_1d_clip)[1:])
+	elif not log:
+		ax.plot(xf[1:], fft_1d_clip[1:])
+
+	ax.set_xlabel("Frequency (1/m)")
+	ax.set_ylabel("log(Magnitude)")
+
+	if ax_mod:
+		print("Axis object passed so returning axis object")
+		return ax
+	else:
+		print("No axis object passed so should plot image")
+		plt.show()
+		return None
+
+def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', log=False):
+	"""
+	Plots the results of an ft in the units of the original input (x) data (SPACE space)
+
+	Based on a k scale calculated using map_k_from_x, x is converted back from the frequency 
+	domian using (1/k)/2
+
+	e.g.
+
+	x is 500 m -> 5000 m   (perhaps distance along a transect)
+	y is -1000 m -> +200 m (perhaps bathymetric elevation)
+
+	your plot will be log(FT mgnitude) vs wavelength in m
+
+	Remember, if you have x/y data where x is 500 m - 5000 m and y is -1000m - +200m, 
+	your FT v swavelength (m) plot will start at your step size and not at the min value 
+	of your input x axis as it illustrates wavelengths in x units, not location! This may 
+	seem basic, but I spent 3 hours trying to get my head around that.
+
+	VARIABLES
+	fft_1d_clip      : absolute component of an ft - must be same length as x_clip
+	x_clip           : x axis - such as distance along a transect
+	sample_spacing   : sample spacing between x axis values
+	ax               : axis object - if none passed, function just shows plot
+
+	RETURN
+	"""
+
+	tests.test_length_equality(fft_1d_clip, x_clip)
+
+	if ax == '':
+		ax_mod=False
+		print("No axis object passed so creating figure")
+		fig=plt.figure()
+		ax=fig.add_subplot(111)
+	else:
+		ax_mod=True
+		print("Axis object passed so modifying object")
+
+	# calculate k from x 	
+	xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip))
+
+	#plot ft against frequency (1/m)
+	########## CONVERT WAVELENGTHS TO METRES ################
+	xf_m=1/xf[1:]       # <<< 1/xf gives wavelength in metres
+						# <<< The first value of 1/xf will be nan or 
+						# infinity as 0 wavelengths have no length 
+						# and 1/0 is infinity! Therefore, ignore value [0]
+						# hence only considering elements [1:]
+
+
+	test_space_space_wavelength(sample_spacing, min(xf_m/2))
+
+	if log:
+		ax.plot((xf_m/2), np.log(fft_1d_clip)[1:])   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
+												  # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
+	elif not log:
+		ax.plot((xf_m/2), fft_1d_clip[1:])   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
+												  # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
+	
+	ax.set_xlabel("Wavelength (m)")
+	ax.set_ylabel("log(Magnitude)")
+
+	if ax_mod:
+		print("Axis object passed so returning axis object")
+		return ax
+	else:
+		print("No axis object passed so should plot image")
+		plt.show()
+		return None
 
 def plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing,n=''):
 	"""
@@ -157,110 +282,22 @@ def plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing,n=''):
 	if n == '':
 		n=len(x_clip)
 	
-	fig = plt.figure()
-	#ax1 =  fig.add_subplot(111)
-	ax1 = fig.add_subplot(311)
-	ax2 = fig.add_subplot(312)
-	ax3 = fig.add_subplot(313)
+	fft_1d_clip, x_clip, sample_spacing
 
-	# plot ft against index number (i.e. index number of each ft value from the ft vector)
-	x_label, y_label, plot_type, ax1 = frequency_plot(np.log(fft_1d_clip), ax1, y_label="log(Magnitude)")
-	ax1.set_xlabel(x_label)
-	ax1.set_ylabel(y_label)
+	fig=plt.figure()
+	ax1=fig.add_subplot(311)
+	ax2=fig.add_subplot(312)
+	ax3=fig.add_subplot(313)
 
-	
-	# calculate k from x (create linear spaced x axis based on mean spacing)
-	#lin_dist=np.linspace(0, len(x_clip)*sample_spacing, len(x_clip))
-	#lin_dist=np.linspace(sample_spacing, len(x_clip)*sample_spacing, len(x_clip))
-	#lin_dist=np.linspace(x_clip[0], len(x_clip)*sample_spacing, len(x_clip))        # start linear spacing at value matching first element of x_clip
-	#xf = map_k_from_x(lin_dist, sample_spacing, n=len(x_clip), x_min=0)
+	_, _, _, ax1 = frequency_plot(fft_1d_clip, ax1, x_label="Index", y_label="log(Magnitude)", log=True)
+		
+	ax2 = plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing, ax=ax2, log=True)
 
-	#xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip), x_min=0)
-	xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip))
-
-	#plot ft against frequency (1/m)
-	#ax2.plot(xf, np.log(fft_1d[:len(fft_1d)/2]))
-	ax2.plot(xf[1:], np.log(fft_1d_clip)[1:])
-	ax2.set_xlabel("Frequency (1/m)")
-	ax2.set_ylabel("log(Magnitude)")
-
-	#plot ft against frequency (1/m)
-	########## CONVERT WAVELENGTHS TO METRES ################
-	xf_m=1/xf[1:]       # <<< 1/xf gives wavelength in metres
-						# <<< The first value of 1/xf will be nan or 
-						# infinity as 0 wavelengths have no length 
-						# and 1/0 is infinity! Therefore, ignore value [0]
-						# hence only considering elements [1:]
-	
-	#ax3.plot((xf_m/2)+x_clip.min(), np.log(fft_1d_clip)[1:])   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
-															    # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
-
-	#ax3.plot(xf_m, np.log(fft_1d_clip)[1:])
-	ax3.plot((xf_m/2), np.log(fft_1d_clip)[1:])   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
-												  # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
-
-	ax3.set_xlabel("Wavelength (m)")
-	ax3.set_ylabel("log(Magnitude)")
+	ax3 = plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax=ax3, log=True)
 
 	plt.show()
 
-def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax=0):
-	"""
-	Plots the results of an ft in the units of the original input (x) data 
-
-	e.g.
-
-	x is 500 m -> 5000 m   (perhaps distance along a transect)
-	y is -1000 m -> +200 m (perhaps bathymetric elevation)
-
-	your plot will be log(FT mgnitude) vs wavelength in m
-
-	Remember, if you have x/y data where x is 500 m - 5000 m and y is -1000m - +200m, 
-	your FT v swavelength (m) plot will start at your step size and not at the min value 
-	of your input x axis as it illustrates wavelengths in x units, not location! This may 
-	seem basic, but I spent 3 hours trying to get my head around that.
-
-	VARIABLES
-	fft_1d_clip      : absolute component of an ft - must be same length as x_clip
-	x_clip           : x axis - such as distance along a transect
-	sample_spacing   : sample spacing between x axis values
-	ax               : axis object - if none passed, function just shows plot
-
-	RETURN
-	"""
-
-	tests.test_length_equality(fft_1d_clip, x_clip)
-
-	if ax == 0:
-		print("No axis object passed so creating figure")
-		fig=plt.figure()
-		ax=fig.add_subplot(111)
-
-	# calculate k from x 	
-	xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip))
-
-	#plot ft against frequency (1/m)
-	########## CONVERT WAVELENGTHS TO METRES ################
-	xf_m=1/xf[1:]       # <<< 1/xf gives wavelength in metres
-						# <<< The first value of 1/xf will be nan or 
-						# infinity as 0 wavelengths have no length 
-						# and 1/0 is infinity! Therefore, ignore value [0]
-						# hence only considering elements [1:]
-
-
-	ax.plot((xf_m/2), np.log(fft_1d_clip)[1:])   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
-												  # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
-	ax.set_xlabel("Wavelength (m)")
-	ax.set_ylabel("log(Magnitude)")
-
-	if ax != 0:
-		return ax
-	elif ax == 0:
-		plt.show()
-
-
-
-def plot_input_vs_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
+def plot_input_AND_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
 	"""
 	Plots results of ft against wavelength (space space i.e. units of input x axis) as well as a plot of the original z data (space space) for comparison
 
@@ -294,7 +331,36 @@ def plot_input_vs_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
 	ax2.set_title("Fjord FT: log(magnitude) vs wavelength(m)") ## pass in title as option - default is nothing 
 	
 	plt.show()
+
+"""
+# plot wavelengths (nb/  in pixels)
+def wavelength_plot (wavelengths,fft_1d_snip):
+	x_label = 'Wavelength'
+	y_label = 'Magnitude'
+	plot_type = "freq_vs_wavelengths"
+	ax.plot(wavelengths,fft_1d_snip) 
+	return x_label, y_label, plot_type, ax
 	
+def magnitude_metres(fft_1d_snip, array_length):
+	mag_m = fft_1d_snip/math.sqrt(array_length)
+	return mag_m
+	
+def wavelength_metres(pixel_size, wavelengths):
+	wavelength_m = wavelengths*pixel_size
+	return wavelength_m
+
+def FFT_plot(site, ax, transect_number, plot_type, output_path, x_label, y_label, magnitude_units='px', wavelength_units='px'):
+	#plt.clf()
+	time_stamp = strftime("%H.%M.%S")
+	name = "%s_transect_%i_%s_%s.pdf" %(site, transect_number, plot_type, time_stamp) 
+	#ax.set_title("Helheim_transect_%i_FFT" %(transect_number))
+	output_name = "%s/%s" %(output_path, name)
+	plt.xlabel("%s (%s)" %(x_label, wavelength_units))
+	plt.ylabel("%s (%s)" %(y_label, magnitude_units))
+	#plt.savefig(output_name) 
+	plt.show()
+"""
+
 if __name__ == "__main__":
 
 	#some toy data
