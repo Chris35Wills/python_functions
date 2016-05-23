@@ -13,8 +13,8 @@ import time
 import pyproj
 
 # Predefined projections
-wgs84 = pyproj.Proj("+init=EPSG:4326")
-utm22n = pyproj.Proj("+init=EPSG:32622")
+wgs84 = pyproj.Proj("+init=EPSG:4326")# +no_defs=True")
+utm22n = pyproj.Proj("+init=EPSG:32622")# +no_defs=True")
 bamber_npstereo = pyproj.Proj("+proj=stere +lat_0=90 +lat_ts=71 +lon_0=-39 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
 
 #infile="C:/GitHub/synthetic_channels/test_output/site_6_PATHS/path_5.csv"
