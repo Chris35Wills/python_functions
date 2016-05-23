@@ -56,6 +56,9 @@ def test_length_equality(x,y):
 ################
 # Main functions
 
+# <<<<<<<<<<<<<<<< replace with np.fft.rfftfrq # rfftfrq only gives the positive half of the frequencies as oposed to fftfrq
+# <<<<<<<<<<<<<<<< np.fft.rfft will give the correspondoing half of the fft amplitudes (np.fft.fft gives you both halves but you only want one side)
+# <<<<<<<<<<<<<<<< getting back to real space is still calculated correctly using: (1/k)/2
 def map_k_from_x(x, sample_spacing, return_x_units=False, n=''):
 	"""
 	Maps k in frequency space from x in space space.
@@ -149,6 +152,8 @@ def frequency_plot(fft_1d_snip, ax, skip_first_value=True, x_label="", y_label="
 	return x_label, y_label, plot_type, ax
 	
 
+#<<<<<<<<<< plt.loglog   to replace
+#<<<<<<<<<< plt.semilogx to replace
 def plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing,n='', ax='', log=False, log_log=False):
 	"""
 	Plots the results of an ft in frequency space (1/units of original input (x)) (FREQUENCY space)
