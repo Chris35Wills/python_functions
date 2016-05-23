@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 #############
 # Quick tests
 
+# easy test to write: result of conversion from k space to x space MUST be <= half of the maximum input distance
+
 def test_space_space_wavelength(sample_spacing, min_xf_space_space):
 	"""
 	For conversion of k space back to space space, the minimum converted value (min_xf_space_space) 
@@ -276,8 +278,9 @@ def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', 
 		print("Axis object passed so modifying object")
 
 	# calculate k from x 	
-	xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip))
-
+	#xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip))
+	xf = map_k_from_x(x_clip, sample_spacing)
+	
 	#plot ft against frequency (1/m)
 	########## CONVERT WAVELENGTHS TO METRES ################
 	xf_m=1/xf[1:]       # <<< 1/xf gives wavelength in metres
@@ -286,19 +289,24 @@ def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', 
 						# and 1/0 is infinity! Therefore, ignore value [0]
 						# hence only considering elements [1:]
 
-
 	#print("Just before min test")
 	#print("Sample spacing: %f" %sample_spacing)
 	#print("Min xf spacing (space space): %f" %min(xf_m/2))
 
 	test_space_space_wavelength(sample_spacing, min(xf_m/2))
 
+	# only consider half of fft <<< 
+	fft_1d_clip=fft_1d_clip[1:len(fft_1d_clip)/2] #<< THIS IS A ONE WAY FREQUENCY RANGE
+	#fft_1d_clip=fft_1d_clip[:len(fft_1d_clip)] #<< THIS IS A TWO WAY FREQUENCY RANGE (xf must also be two range frequency if you use this)
+	
+	test_length_equality(fft_1d_clip, xf_m)
+
 	if log:
-		ax.plot((xf_m/2), np.log(fft_1d_clip)[1:])   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
-												  # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
+		ax.plot((xf_m/2), np.log(fft_1d_clip))   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
+												 # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
 	elif not log:
-		ax.plot((xf_m/2), fft_1d_clip[1:])   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
-												  # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
+		ax.plot((xf_m/2), fft_1d_clip)   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
+										 # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
 	
 	ax.set_xlabel("Wavelength (m)")
 	ax.set_ylabel("log(Magnitude)")
@@ -386,7 +394,7 @@ def plot_input_AND_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
 	ax1.set_ylabel("Bathymetric elevation (m a.s.l.)") ## pass in title as option - default is y
 	ax1.set_title("Fjord centreline elevation transect") ## pass in title as option - default is nothing 
 
-	ax2=plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax=ax2)
+	ax2, _ =plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax=ax2)
 	ax2.set_xlabel("Wavelength (m)")
 	ax2.set_ylabel("log(Magnitude)")
 	ax2.set_title("Fjord FT: log(magnitude) vs wavelength(m)") ## pass in title as option - default is nothing 
@@ -586,8 +594,9 @@ if __name__ == "__main__":
 	x_clip=dist[0:20]    # as spacing is ~200m, 0:20 will be the first 4000m
 	z_clip=z[0:20]
 
+	print("Max distance: %i" %x_clip.max())
+	
 	# plot the ft using different x axis
-
 	#plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing)
 	plot_input_AND_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing)
 	#plot_input_AND_ft_space(z_clip, fft_1d_clip, x_clip, sample_spacing)
