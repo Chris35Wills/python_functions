@@ -2,12 +2,17 @@
 FT analysis and plotting library
 
 Various tools to assist in the calculation and plotting of FT analysis
+
+Help with FTs can be found here:
+	http://www.imagemagick.org/Usage/fourier/
+	http://www.revisemri.com/tutorials/what_is_k_space/
+	http://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/
+	https://plot.ly/matplotlib/fft/
+
 """
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
-import tests
 
 #############
 # Quick tests
@@ -21,9 +26,18 @@ def test_space_space_wavelength(sample_spacing, min_xf_space_space):
 	min_xf_space_space
 	sample_spacing
 	"""
+
+	print("What I can see...")
+	print("Sample spacing: %f (float)" %np.around(sample_spacing, decimals=2))
+	print("Min xf spacing (space space): %f (float)" %(np.round(min_xf_space_space, decimals=2)))
+
 	try:
-		assert min_xf_space_space < sample_spacing
+		print("Asserting whether min_xf_space_space (%f) >= sample_spacing (%f)" %(np.round(min_xf_space_space, decimals=2), np.around(sample_spacing, decimals=2)))
+		assert np.round(min_xf_space_space, decimals=2) >= np.round(sample_spacing, decimals=2)
 	except AssertionError:
+		print("Yikes!")
+		print("Sample spacing: %f" %np.round(sample_spacing, decimals=2))
+		print("Min xf spacing (space space): %f" %np.round(min_xf_space_space, decimals=2))
 		sys.exit("Sample spacing is greater than k value converted back to space space ")
 
 def test_length_equality(x,y):
@@ -114,7 +128,7 @@ def frequency_plot(fft_1d_snip, ax, skip_first_value=True, x_label="", y_label="
 		x=np.linspace(1, len(fft_1d_snip[1:]), len(fft_1d_snip[1:]))
 		y=fft_1d_snip[1:]
 
-		tests.test_length_equality(x,y)
+		test_length_equality(x,y)
 
 		if log:
 			ax.plot(x,np.log(y)) 
@@ -129,7 +143,8 @@ def frequency_plot(fft_1d_snip, ax, skip_first_value=True, x_label="", y_label="
 	
 	return x_label, y_label, plot_type, ax
 	
-def plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing,n='', ax='', log=False):
+
+def plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing,n='', ax='', log=False, log_log=False):
 	"""
 	Plots the results of an ft in frequency space (1/units of original input (x)) (FREQUENCY space)
 
@@ -150,11 +165,23 @@ def plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing,n='', ax='', l
 	x_clip           : x axis - such as distance along a transect
 	sample_spacing   : sample spacing between x axis values
 	ax               : axis object - if none passed, function just shows plot
+	log 			 : if True displays log magnitude
+	log_log 		 : if True displays log magnitude (y) and log frequency (x) - this 
+					   can be useful for identifying power laws from detrended data (to 
+					   do this, plot a linear trend to the data if appropriate and consider 
+					   the gradient - make sure to consider the strength of your trend though 
+					   - maybe there isn;t even one there!!)
 
 	RETURN
+
+	if ax_mod = True:
+		ax object
+		xf vector    NOT LOG (units of 1/input x units - this will be one element less than the input fft_1d_clip vector as the first value is ignored)
+	if ax_mod = False:
+		xf vector    NOT LOG (units of 1/input x units - this will be one element less than the input fft_1d_clip vector as the first value is ignored)
 	"""
 
-	tests.test_length_equality(fft_1d_clip, x_clip)
+	test_length_equality(fft_1d_clip, x_clip)
 
 	if ax == '':
 		ax_mod=False
@@ -170,21 +197,30 @@ def plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing,n='', ax='', l
 
 	#plot ft against frequency (1/m)
 	#ax2.plot(xf, np.log(fft_1d[:len(fft_1d)/2]))
-	if log:
+	if log and not log_log:
+		print("Logging the magnitude (y axis)")
 		ax.plot(xf[1:], np.log(fft_1d_clip)[1:])
-	elif not log:
+		ax.set_xlabel("Frequency (1/m)")
+		ax.set_ylabel("log(Magnitude)")
+	elif log_log or (log_log and log):
+		print("Logging the magnitude (y axis) and frequency (x axis)")
+		ax.plot(np.log(xf[1:]), np.log(fft_1d_clip)[1:])
+		ax.set_xlabel("log(Frequency (1/m))")
+		ax.set_ylabel("log(Magnitude)")
+	elif not log and not log_log:
+		print("Not logging either axis")
 		ax.plot(xf[1:], fft_1d_clip[1:])
-
-	ax.set_xlabel("Frequency (1/m)")
-	ax.set_ylabel("log(Magnitude)")
+		ax.set_xlabel("Frequency (1/m)")
+		ax.set_ylabel("Magnitude")
 
 	if ax_mod:
 		print("Axis object passed so returning axis object")
-		return ax
+		return ax, xf[1:]
 	else:
 		print("No axis object passed so should plot image")
 		plt.show()
-		return None
+		return xf[1:]
+
 
 def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', log=False):
 	"""
@@ -212,9 +248,14 @@ def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', 
 	ax               : axis object - if none passed, function just shows plot
 
 	RETURN
+	if ax_mod = True:
+		ax object
+		xf_m vector   NOT LOG (units of m (or whatever x was originally supplied in) - this will be one element less than the input fft_1d_clip vector as the first value is ignored)
+	if ax_mod = False:
+		xf_m vector   NOT LOG (units of m (or whatever x was originally supplied in) - this will be one element less than the input fft_1d_clip vector as the first value is ignored)
 	"""
 
-	tests.test_length_equality(fft_1d_clip, x_clip)
+	test_length_equality(fft_1d_clip, x_clip)
 
 	if ax == '':
 		ax_mod=False
@@ -237,6 +278,10 @@ def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', 
 						# hence only considering elements [1:]
 
 
+	#print("Just before min test")
+	#print("Sample spacing: %f" %sample_spacing)
+	#print("Min xf spacing (space space): %f" %min(xf_m/2))
+
 	test_space_space_wavelength(sample_spacing, min(xf_m/2))
 
 	if log:
@@ -251,11 +296,12 @@ def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', 
 
 	if ax_mod:
 		print("Axis object passed so returning axis object")
-		return ax
+		return ax, xf_m/2
 	else:
 		print("No axis object passed so should plot image")
 		plt.show()
-		return None
+		return xf_m/2
+
 
 def plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing,n=''):
 	"""
@@ -277,7 +323,7 @@ def plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing,n=''):
 	Nothing
 	"""
 
-	tests.test_length_equality(fft_1d_clip,x_clip)
+	test_length_equality(fft_1d_clip,x_clip)
 
 	if n == '':
 		n=len(x_clip)
@@ -285,17 +331,23 @@ def plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing,n=''):
 	fft_1d_clip, x_clip, sample_spacing
 
 	fig=plt.figure()
-	ax1=fig.add_subplot(311)
-	ax2=fig.add_subplot(312)
-	ax3=fig.add_subplot(313)
+	ax1=fig.add_subplot(411)
+	ax2=fig.add_subplot(412)
+	ax3=fig.add_subplot(413)
+	ax4=fig.add_subplot(414)
 
 	_, _, _, ax1 = frequency_plot(fft_1d_clip, ax1, x_label="Index", y_label="log(Magnitude)", log=True)
 		
 	ax2 = plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing, ax=ax2, log=True)
 
-	ax3 = plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax=ax3, log=True)
+	ax3 = plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing, ax=ax3, log=True, log_log=True)
+
+	ax4 = plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax=ax4, log=True)
+
+	
 
 	plt.show()
+
 
 def plot_input_AND_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
 	"""
@@ -317,8 +369,8 @@ def plot_input_AND_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
 	"""
 
 	fig=plt.figure()
-	ax1=fig.add_subplot(121)
-	ax2=fig.add_subplot(122)
+	ax1=fig.add_subplot(211)
+	ax2=fig.add_subplot(212)
 
 	ax1.plot(x_clip, z_clip)
 	ax1.set_xlabel("Distance along transect (m)") ## pass in title as option - default is x
@@ -331,6 +383,43 @@ def plot_input_AND_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
 	ax2.set_title("Fjord FT: log(magnitude) vs wavelength(m)") ## pass in title as option - default is nothing 
 	
 	plt.show()
+
+
+def plot_input_AND_ft_space(z_clip, fft_1d_clip, x_clip, sample_spacing):
+	"""
+	Plots results of ft against wavelength (space space i.e. units of input x axis) as well as a plot of the original z data (space space) for comparison
+
+	plot 1: z vs x (space space units e.g. metres)
+	plot 2: ft magnitude vs wavelength (units of x OR 1/frequency)
+
+	VARIABLES
+
+	z_clip           : 'raw' z data (clipped to same indicies as the fft_1d_clip and x_clip arrays)
+	fft_1d_clip      : a 1d FT vector (absolute value not real/imaginery pair) perhaps clipped to highligh certain values (e.g. first 20)
+	x_clip           : an x axis vector - perhaps cumulative distance of ovbservations - perhaps clipped to highligh certain values (e.g. first 20)
+	sample_spacing   : sample spacing of elements of x
+
+	RETURN 
+
+	Nothing
+	"""
+
+	fig=plt.figure()
+	ax1=fig.add_subplot(211)
+	ax2=fig.add_subplot(212)
+
+	ax1.plot(x_clip, z_clip)
+	ax1.set_xlabel("Distance along transect (m)") ## pass in title as option - default is x
+	ax1.set_ylabel("Bathymetric elevation (m a.s.l.)") ## pass in title as option - default is y
+	ax1.set_title("Fjord centreline elevation transect") ## pass in title as option - default is nothing 
+
+	ax2=plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing, ax=ax2)
+	ax2.set_xlabel("Wavelength (1/m)")
+	ax2.set_ylabel("log(Magnitude)")
+	ax2.set_title("Fjord FT: log(magnitude) vs wavelength(m)") ## pass in title as option - default is nothing 
+	
+	plt.show()
+
 
 """
 # plot wavelengths (nb/  in pixels)
@@ -485,10 +574,12 @@ if __name__ == "__main__":
 
 	# clip ft and x axis (dist which is in metres) to a range of interest
 	fft_1d_clip=fft_1d[0:20]
-	x_clip=dist[0:20]
+	x_clip=dist[0:20]    # as spacing is ~200m, 0:20 will be the first 4000m
+	z_clip=z[0:20]
 
 	# plot the ft using different x axis
-	plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing)
 
-
-
+	#plot_ft_different_x_scales(fft_1d_clip, x_clip, sample_spacing)
+	plot_input_AND_ft_space_space(z_clip, fft_1d_clip, x_clip, sample_spacing)
+	#plot_input_AND_ft_space(z_clip, fft_1d_clip, x_clip, sample_spacing)
+	#plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing, log=True, log_log=True) ## log log plots allow id of linear regions - linear regions imply no one wavelength dominates - try and get the slope of the linear region (kind of like a weighting factor)
