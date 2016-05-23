@@ -1,3 +1,5 @@
+from __future__ import division
+
 """
 FT analysis and plotting library
 
@@ -193,7 +195,12 @@ def plot_ft_against_frq_space(fft_1d_clip, x_clip, sample_spacing,n='', ax='', l
 		print("Axis object passed so modifying object")
 
 	# calculate k from x 	
-	xf = map_k_from_x(x_clip, sample_spacing, n=len(x_clip))
+	xf = map_k_from_x(x_clip, sample_spacing)
+
+	# only consider half of fft (one side frequency range considered)
+	fft_1d_clip=fft_1d_clip[:len(fft_1d_clip)/2]
+	
+	test_length_equality(fft_1d_clip, xf)
 
 	#plot ft against frequency (1/m)
 	#ax2.plot(xf, np.log(fft_1d[:len(fft_1d)/2]))
