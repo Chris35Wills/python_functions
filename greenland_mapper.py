@@ -44,8 +44,8 @@ if __name__ == '__main__':
 
     mer = np.arange(-100, 120, 10.)
     par = np.arange(0, 90, 10.)
-    nps.drawparallels(par, linewidth=0.5, dashes=[1, 5])
-    nps.drawmeridians(mer, linewidth=0.5, dashes=[1, 5])
+    #nps.drawparallels(par, linewidth=0.5, dashes=[1, 5])
+    #nps.drawmeridians(mer, linewidth=0.5, dashes=[1, 5])
        
     ## Plot a point...  
     '''
@@ -56,4 +56,4 @@ if __name__ == '__main__':
     '''
 
     #plt.show()
-    plt.savefig("O:/Documents/CHRIS_Bristol/Mapping/greenland_overview.png", dpi=300, transparent=True)
+    plt.savefig("./greenland_overview.png", dpi=300, transparent=True)
