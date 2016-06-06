@@ -62,14 +62,16 @@ def pandas_xy_dist(df, x_col='x', y_col='y'):
 	return spacing, cumulative, df
 
 
-import pandas as pd
-import numpy as np
+# TOY DATA
+"""
 run="run_3"
 pnt_path="C:/GitHub/synthetic_channels/FENTY_DEM_along_track_FT/%s/good_paths" %run
 pnt_f='%s/densified_path_3_clipped_with_elev.csv' %pnt_path
 pnts=pd.read_csv(pnt_f, sep=',')
-pnts['z_cubic'][120:]=np.nan # set nans at end
+#pnts['z_cubic'][120:]=np.nan # set nans at end
 pnts['z_cubic'][0:10]=np.nan # set nans at head
+pnts['z_cubic'][70:73]=np.nan # set nans at head
+"""
 
 def location_of_nan(df, col_name):
 	"""
@@ -90,6 +92,7 @@ def location_of_nan(df, col_name):
 
 	return nan_loc, bools.astype(int)
 
+
 def skip_nan_at_head(df, col_name):
 	"""
 	Cuts all rows from top of file if specificed col contains
@@ -103,37 +106,43 @@ def skip_nan_at_head(df, col_name):
 	RETURN
 	df_clipped : df with noVal rows ommited from top of file
 	"""
-	
+	#reset index so it starts at 0	
+	df = df.reset_index(drop=True)
+
 	#get nan locations
 	nan_loc, bools = location_of_nan(df, col_name)
 
 	# check if first value in df (first position = 0) is nan
-	first_is_nan=nan_loc.sort_values()[0]==0
+	if len(nan_loc) != 0:
+		first_is_nan=nan_loc.sort_values()[0]==0
 
-	# if yes, check spacing between indicies
+		if first_is_nan:
+			print("first value is no value - removing all noVal instances at top of dataframe...")
+			# get space between index locations (of nan locations)
+			spacing = np.ediff1d(nan_loc)
+			#get values that are not in consequitive index locations (i.e. index spacing != 1)
+			not_nextdoor= spacing[spacing!=1]#.sort()
+			
+			#get preceding index of first value present in not_nextdoor 
+			#array of 1,2,3,4,5,6,10 gives 1d diffs of 1,1,1,1,1,4 (array is one shorter as it has gone, 2-1, 3-2 ... 10-6)
+			if len(not_nextdoor)!=0:
+				ix=int(util.get_index_1d(spacing, not_nextdoor[0])[0]) # index in spacing of first non-consequitive index pair
+				# drop rows from first row until row before first row where distance !=1
+				df=df.drop(df.index[0: nan_loc[ix]+1])
+			elif len(not_nextdoor)==0: # i.e. all nan indicies are consequitive
+				df=df.drop(df.index[0: nan_loc[len(nan_loc)-1]])
 
-	if first_is_nan:
-		print("first value isn't no value - skipping until next non-noVal instance...")
+			return df
+	
+		else:
+			print("first value isn't no value")
+			return df
 
-		# get space between index locations (of nan locations)
-		spacing = np.ediff1d(nan_loc)
-		#get values that are not in consequitive index locations (i.e. index spacing != 1)
-		not_nextdoor= spacing[spacing!=1]#.sort()
-		#get preceding index of first value present in not_nextdoor 
-		#array of 1,2,3,4,5,6,10 gives 1d diffs of 1,1,1,1,1,4 (array is one shorter as it has gone, 2-1, 3-2 ... 10-6)
-		ix=int(util.get_index_1d(spacing, not_nextdoor[0])[0]) # index in spacing of first non-consequitive index pair
-		preceding_index=nan_loc[ix] # value in nan_loc
-		# drop rows from first row until row before first row where distance !=1
-		df=df.drop(df.index[0: preceding_index+1])
-
+	elif len(nan_loc) == 0:
+		print("No nan values :)")
 		return df
-	
-	else:
-		print("first value isn't no value")
-	
-		return None
 
-def skip_nan_at_tail():
+def skip_nan_at_tail(df, col_name):
 	"""
 	Cuts all rows from bottom of file if specificed col 
 	has a value == noVal (default is np.nan) until first 
@@ -147,64 +156,80 @@ def skip_nan_at_tail():
 	RETURN
 	df_clipped : df with noVal rows ommited from bottom of file
 	"""
+
+	#reset index so it starts at 0
+	df = df.reset_index(drop=True)
+
 	#get nan locations
-	nan_loc, bools = location_of_nan(df, col_name, noVal)
+	nan_loc, bools = location_of_nan(df, col_name)
 
 	# check if last value in df (last position = len(df)-1) is nan
-	last_is_nan=nan_loc.sort_values()[len(nan_loc)-1]==(len(df)-1)
+	if len(nan_loc) != 0:
+		last_is_nan=nan_loc.sort_values()[len(nan_loc)-1]==(len(df)-1)
 
-	if last_is_nan:
-		print("first value isn't no value - skipping until next non-noVal instance...")
+		if last_is_nan:
+			print("last value is no value - removing all noVal instances at end of dataframe...")
+			#nan_loc=nan_loc[::-1] # flip locations (last is first)
+			spacing = np.ediff1d(nan_loc) # calc index spacing
+			not_nextdoor= spacing[np.abs(spacing)!=1]#.sort()
 
-	else:
-		print("last value isn't no value")
-	
-		return None
+			if len(not_nextdoor)!=0:
+				ix=int(util.get_index_1d(spacing, not_nextdoor[len(not_nextdoor)-1])[0]) # index in spacing of last non-consequitive index pair
+				# drop rows from first row until row before first row where distance !=1
+				df=df.drop(df.index[nan_loc[ix+1]: nan_loc[len(nan_loc)-1]+1]) # ix will be the index of the pair partner that is non-consequitive relative to consequitive partners e.g. 39, 40, 43, 44 << index of 40 will be returned...
+			else:
+				df=df.drop(df.index[nan_loc[0]: nan_loc[len(nan_loc)-1]+1]) 
 
-#drop rows where kill value == 0
+			return df
 
-# create column called kill
-	# z == NaN gives kill value of 1
-	# z != NaN gives kill value of 0
-# drop head if nan:
-# if kill[0] is 1, drop all rows until preceding row before kill is 1
-# drop tail if nan:
-# if kill[len(df)-1] is 1, drop all rows until preceding row before kill is 1
+		else:
+			print("last value isn't no value")
+		
+			return df
 
-pnt_test=points.copy()
-pnt_dropped=pnt_test.drop(pnt_test[pnt_test.kill == 0].index)
+	elif len(nan_loc) == 0:
+		print("No nan values :)")
+		return df
 
-pnt_dropped['index_current'] = pnt_dropped.index
+def bin_data(df, bin_width, min_bin, max_bin, column_to_bin=''):
+	"""
+	Bins data in dataframe accordinging to defined bins.
+	Inspiration from here: http://chrisalbon.com/python/pandas_binning_data.html
 
-"""
-# plot indicies to identify any step changes...
-indicies=pnt_dropped['index_current'].values
-xs=np.arange(0,len(indicies), 1)
-plt.scatter(xs, indicies), plt.title("ID where to drop points"), plt.show()
-"""
+	VARIABLES
+	df : a pandas dataframe
+	bin_width : width of each bin
+	min_bin : minimum bin edge
+	max_bin : maximum bin edge
+	column_to_bin : column to use to sort dataframe based on defined bins
 
-# calculate differences between indicies - drop all rows including and following the 
-# first difference that is not 1 (i.e. indicies are not contiguous)
-pnt_dropped = pnt_dropped.assign(diffs=pd.rolling_apply(pnt_dropped['index_current'],2,lambda x: x[1]-x[0])) 
-	# assign creates a new column as part of a dataframe
-	# rolling_apply implements a moving function
-		# as applied above, this requires the column to use, 
-		# the size of the mvoing window (in this case 2) and 
-		# in this case a fucntion (subtracting the preceding 
-		# element from each current element)
+	RETURN
+	df : + new columns containing category info according to the data defined by column_to_bin
+	"""
 
-drop_index = pnt_dropped.where(pnt_dropped['diffs'] > 1).dropna()
-	# returns the index of the first element in diffs greater 
-	# than 1 (implying non-contiguous indexing in this case)
+	bin_width=200.
+	min_bin=0
+	max_bin=37400.
+	column_to_bin='wavelength_m'
 
-if not drop_index.empty:
+	bins = np.arange(0, (max_bin+bin_width), bin_width)
 
-	pnt_dropped = pnt_dropped.loc[:drop_index.index[0]-1]
-		# subsets the dataframe up to the preceding row 
-		# before the index of drop_index
+	# create bin names
+	nummerical_names=np.arange(0, max_bin, bin_width)
+	#group_names= ["%.2f" % x for x in nummerical_names]
 
-	#pnt_dropped_xy = pnt_dropped.drop('ix', 1)
-	#pnt_dropped_xy = pnt_dropped_xy.drop('iy', 1)
-	pnt_dropped_xy = pnt_dropped.drop('kill', 1)
-	pnt_dropped_xy = pnt_dropped_xy.drop('index_current', 1)
-	pnt_dropped_xy = pnt_dropped_xy.drop('diffs', 1)
+	#string_names=[str(i) for i in nummerical_names]
+	#string_names_PLUS=[str(i) for i in nummerical_names+bin_width]
+	#group_names = ["%s - %s" %(x for x in string_names, y for y in string_names_PLUS)]
+	group_names= ["%.2f" % x for x in nummerical_names]
+
+	# categories specific data according to bins (applies across the row so everything is kept together)
+	df['categories_str'] = pd.cut(df[column_to_bin], bins, labels=group_names)
+	df['categories_int'] = pd.cut(df['wavelength_m'], bins, labels=nummerical_names)
+
+	return df, (group_names, nummerical_names)
+
+
+
+if __name__ == "__main__":
+	print("Run from import.")
