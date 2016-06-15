@@ -308,13 +308,15 @@ def plot_ft_against_frq_space_space(fft_1d_clip, x_clip, sample_spacing, ax='', 
 
 	if log:
 		ax.plot((xf_m/2), np.log(fft_1d_clip))   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
-												 # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
+		ax.set_xlabel("Wavelength (m)")
+		ax.set_ylabel("log(Magnitude)")												 # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
+
 	elif not log:
 		ax.plot((xf_m/2), fft_1d_clip)   # map_k_from_x considers the nyquist frency which divides by a factor of 2, so k to x 
 										 # space is (1/k) / 2 (otheriwse your new max xf_m value will be twice as big as your max input x_clip value)
 	
-	ax.set_xlabel("Wavelength (m)")
-	ax.set_ylabel("log(Magnitude)")
+		ax.set_xlabel("Wavelength (m)")
+		ax.set_ylabel("Magnitude")
 
 	if ax_mod:
 		print("Axis object passed so returning axis object")

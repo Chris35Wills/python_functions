@@ -191,7 +191,7 @@ def skip_nan_at_tail(df, col_name):
 		print("No nan values :)")
 		return df
 
-def bin_data(df, bin_width, min_bin, max_bin, column_to_bin=''):
+def bin_data(df, bin_width, max_bin, min_bin=0, column_to_bin='',scale_up_category=1):
 	"""
 	Bins data in dataframe accordinging to defined bins.
 	Inspiration from here: http://chrisalbon.com/python/pandas_binning_data.html
@@ -202,34 +202,35 @@ def bin_data(df, bin_width, min_bin, max_bin, column_to_bin=''):
 	min_bin : minimum bin edge
 	max_bin : maximum bin edge
 	column_to_bin : column to use to sort dataframe based on defined bins
-
+	scale_up_category : scalar to increase integer label values by (default 1) - important if all of your values are < 0.01 (as labels are rounded to 2 dp) - must be 1 or a factor of 10
+	
 	RETURN
 	df : + new columns containing category info according to the data defined by column_to_bin
 	"""
 
-	bin_width=200.
-	min_bin=0
-	max_bin=37400.
-	column_to_bin='wavelength_m'
-
-	bins = np.arange(0, (max_bin+bin_width), bin_width)
+	bins = np.arange(min_bin, (max_bin+bin_width), bin_width)
 
 	# create bin names
-	nummerical_names=np.arange(0, max_bin, bin_width)
+	nummerical_names=np.arange(min_bin*scale_up_category, max_bin*scale_up_category, bin_width*scale_up_category)
 	#group_names= ["%.2f" % x for x in nummerical_names]
 
 	#string_names=[str(i) for i in nummerical_names]
 	#string_names_PLUS=[str(i) for i in nummerical_names+bin_width]
 	#group_names = ["%s - %s" %(x for x in string_names, y for y in string_names_PLUS)]
-	group_names= ["%.2f" % x for x in nummerical_names]
+	
+	if scale_up_category == 1:
+		group_names= ["%.2f" % x for x in nummerical_names]
+	elif scale_up_category != 1:
+		#group_names= ["%.2f x %i" % x for x in nummerical_names] # where second value is the scale up category
+		group_names= ["%.2f" % x for x in nummerical_names]
 
 	# categories specific data according to bins (applies across the row so everything is kept together)
 	df['categories_str'] = pd.cut(df[column_to_bin], bins, labels=group_names)
-	df['categories_int'] = pd.cut(df['wavelength_m'], bins, labels=nummerical_names)
+	df['categories_int'] = pd.cut(df[column_to_bin], bins, labels=nummerical_names)
 
 	return df, (group_names, nummerical_names)
 
-
-
 if __name__ == "__main__":
 	print("Run from import.")
+
+
