@@ -55,8 +55,8 @@ def density_CONTOURS_xy(density_xyz_file, points_x, points_y, opath, opath_no_fi
 	Just saves a contoured density image with overlying points - useful to estimate the density_boundary value	
 	'''
 	xx,yy,zz = concave_hull_funcs.get_density_xyz(density_xyz_file) 
-	resamp_pnt_xx = points_x[1::100]
-	resamp_pnt_yy = points_y[1::100]
+	resamp_pnt_xx = points_x
+	resamp_pnt_yy = points_y
 
 	Z_log = concave_hull_funcs.grid_log_density(xx,yy,zz) 
 
