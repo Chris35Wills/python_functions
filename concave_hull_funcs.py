@@ -75,9 +75,9 @@ def smooth_density_surface_points(Z_log, resamp_pnt_xx, resamp_pnt_yy, opath_no_
 	print(extent)
 	print(" ")
 
-	sys.exit("check inputs")
+	#sys.exit("check inputs")
+	#plt.figure()
 
-	plt.figure()
 	smooth = ndimage.filters.gaussian_filter(Z_log, sigma=1.0, order=0, mode='reflect')
 	smooth[smooth<=density_to_nan_limit] = np.nan
 	
@@ -88,9 +88,9 @@ def smooth_density_surface_points(Z_log, resamp_pnt_xx, resamp_pnt_yy, opath_no_
 
 	file_opath = "%s/contour_input_points_SMOOTH_DENSITY_INPUT_POINTS_%s.png" %(opath_no_file, itr) 
 	util.check_output_dir(file_opath)	
-	plt.savefig(file_opath, bbox_inches='tight')
+	#plt.savefig(file_opath, bbox_inches='tight')
 
-	#plt.show()
+	plt.show()
 
 	return smooth, extent
 
