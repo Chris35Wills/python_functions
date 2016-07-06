@@ -138,7 +138,7 @@ def densify(infile, desired_spacing=200., projection=pyproj.Proj("+init=EPSG:432
 	f=open(outfile, 'w')
 	for i in range(len(all_points)):
 		f.write("%f,%f\n" %(all_points[i,0],all_points[i,1]))
-		print("%f,%f\n" %(all_points[i,0],all_points[i,1]))
+		#print("%f,%f\n" %(all_points[i,0],all_points[i,1]))
 		#print(all_points[i,:])
 
 	f.close()

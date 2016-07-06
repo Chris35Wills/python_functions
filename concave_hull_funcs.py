@@ -48,7 +48,7 @@ def grid_log_density(xx,yy,zz):
 	yi = np.linspace(min(yy), max(yy))
 	X, Y = np.meshgrid(xi, yi)
 	zz_log = np.log(zz)
-	Z_log = ml.griddata(xx, yy, zz_log, xi, yi)
+	Z_log = ml.griddata(xx, yy, zz_log, xi, yi, interp='linear')
 	
 	return Z_log
 
@@ -74,7 +74,7 @@ def smooth_density_surface_points(Z_log, resamp_pnt_xx, resamp_pnt_yy, opath_no_
 	plt.savefig(file_opath, bbox_inches='tight')
 
 	########## repeat to display
-	
+
 	plt.imshow(smooth, origin='lower', extent=extent)
 	plt.set_cmap('cool')
 	plt.colorbar()
