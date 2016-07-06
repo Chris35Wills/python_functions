@@ -53,7 +53,26 @@ def grid_log_density(xx,yy,zz):
 	return Z_log
 
 
+   
 def smooth_density_surface_points(Z_log, resamp_pnt_xx, resamp_pnt_yy, opath_no_file, itr, density_to_nan_limit=-40):
+	
+	print("Z_log")
+	print(Z_log)
+	print("resamp_pnt_xx")
+	print(resamp_pnt_xx)
+	print("resamp_pnt_yy")
+	print(resamp_pnt_yy)
+	print("opath_no_file")
+	print(opath_no_file)
+	print("itr")
+	print(itr)
+	print("density_to_nan_limit")
+	print(density_to_nan_limit)
+
+
+
+	sys.exit("check inputs")
+
 	plt.figure()
 	smooth = ndimage.filters.gaussian_filter(Z_log, sigma=1.0, order=0, mode='reflect')
 	smooth[smooth<=density_to_nan_limit] = np.nan
