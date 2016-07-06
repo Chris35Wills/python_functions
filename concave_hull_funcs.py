@@ -69,19 +69,18 @@ def smooth_density_surface_points(Z_log, resamp_pnt_xx, resamp_pnt_yy, opath_no_
 	print("density_to_nan_limit")
 	print(density_to_nan_limit)
 
-
-
-	sys.exit("check inputs")
-
-	plt.figure()
-	smooth = ndimage.filters.gaussian_filter(Z_log, sigma=1.0, order=0, mode='reflect')
-	smooth[smooth<=density_to_nan_limit] = np.nan
 	extent = (resamp_pnt_xx.min(), resamp_pnt_xx.max(), resamp_pnt_yy.min(), resamp_pnt_yy.max())
 	
 	print(" ")
 	print(extent)
 	print(" ")
 
+	sys.exit("check inputs")
+
+	plt.figure()
+	smooth = ndimage.filters.gaussian_filter(Z_log, sigma=1.0, order=0, mode='reflect')
+	smooth[smooth<=density_to_nan_limit] = np.nan
+	
 	plt.imshow(smooth, origin='lower', extent=extent)
 	plt.set_cmap('cool')
 	plt.colorbar()
