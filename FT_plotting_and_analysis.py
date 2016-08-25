@@ -61,6 +61,10 @@ def test_length_equality(x,y):
 # <<<<<<<<<<<<<<<< getting back to real space is still calculated correctly using: (1/k)/2
 def map_k_from_x(x, sample_spacing, return_x_units=False, n=''):
 	"""
+
+	** THIS IS BASICALLY THE SAME AS: numpy.fft.rfftfreq() ** 
+	** http://docs.scipy.org/doc/numpy-dev/reference/generated/numpy.fft.rfftfreq.html **
+
 	Maps k in frequency space from x in space space.
 
 	Units of k will be 1/whatever units x is provided in (and halved as code caters for Nyquist frequency)
