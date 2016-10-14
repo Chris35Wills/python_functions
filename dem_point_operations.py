@@ -8,7 +8,7 @@ import georaster
 DEM and point operations
 """
 
-def extract_values(dem, points):
+def extract_values(dem, points, extracted_col_header='extracted_z'):
 		"""
 		Extracts points from a dem at point locations - binds them to a pandas dataframe
 
@@ -32,6 +32,6 @@ def extract_values(dem, points):
 
 		dem_values=dem.r[list(iy),list(ix)]
 
-		points['z']=pd.Series(dem_values, index=points.index)
+		points[extracted_col_header]=pd.Series(dem_values, index=points.index)
 
 		return points
