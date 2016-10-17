@@ -43,45 +43,45 @@ def openTiff(file_name):
 	inDs = gdal.Open(file_name, GA_ReadOnly)
 	
 	if inDs is None:
-		print "Couldn't open this file: " + file_name
+		print("Couldn't open this file: " + file_name)
 		sys.exit("Something's missing... can't process file.")
 	else:
-		print "%s opened successfully" %file_name
+		print("%s opened successfully" %file_name)
 			
-		print '~~~~~~~~~~~~~~'
-		print 'Get image size'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get image size')
+		print('~~~~~~~~~~~~~~')
 		cols = inDs.RasterXSize
 		rows = inDs.RasterYSize
 		bands = inDs.RasterCount
 	
-		print "columns: %i" %cols
-		print "rows: %i" %rows
-		print "bands: %i" %bands
+		print("columns: %i" %cols)
+		print("rows: %i" %rows)
+		print("bands: %i" %bands)
 	
-		print '~~~~~~~~~~~~~~'
-		print 'Get georeference information'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get georeference information')
+		print('~~~~~~~~~~~~~~')
 		geotransform = inDs.GetGeoTransform()
 		originX = geotransform[0]
 		originY = geotransform[3]
 		pixelWidth = geotransform[1]
 		pixelHeight = geotransform[5]
 	
-		print "origin x: %i" %originX
-		print "origin y: %i" %originY
-		print "width: %2.2f" %pixelWidth
-		print "height: %2.2f" %pixelHeight
+		print("origin x: %i" %originX)
+		print("origin y: %i" %originY)
+		print("width: %2.2f" %pixelWidth)
+		print("height: %2.2f" %pixelHeight)
 	
 		# Set pixel offset.....
-		print '~~~~~~~~~~~~~~' 
-		print 'Convert image to 2D array'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~' )
+		print('Convert image to 2D array')
+		print('~~~~~~~~~~~~~~')
 		band = inDs.GetRasterBand(1)
 		image_array = band.ReadAsArray(0, 0, cols, rows)
 		image_array_name = file_name
-		print type(image_array)
-		print image_array.shape
+		print(type(image_array))
+		print(image_array.shape)
 		
 		return image_array, pixelWidth, [geotransform, inDs]#, cols, rows, bands, originX, originY, pixelWidth, pixelHeight,image_array_name]
 
@@ -100,45 +100,45 @@ def tiff_to_2d_array_COMPACT(file_name):
 	inDs = gdal.Open(file_name, GA_ReadOnly)
 	
 	if inDs is None:
-		print "Couldn't open this file: " + file_name
+		print("Couldn't open this file: " + file_name)
 		sys.exit("Something's missing... can't process file.")
 	else:
-		print "%s opened successfully" %file_name
+		print("%s opened successfully" %file_name)
 			
-		print '~~~~~~~~~~~~~~'
-		print 'Get image size'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get image size')
+		print('~~~~~~~~~~~~~~')
 		cols = inDs.RasterXSize
 		rows = inDs.RasterYSize
 		bands = inDs.RasterCount
 	
-		print "columns: %i" %cols
-		print "rows: %i" %rows
-		print "bands: %i" %bands
+		print("columns: %i" %cols)
+		print("rows: %i" %rows)
+		print("bands: %i" %bands)
 	
-		print '~~~~~~~~~~~~~~'
-		print 'Get georeference information'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get georeference information')
+		print('~~~~~~~~~~~~~~')
 		geotransform = inDs.GetGeoTransform()
 		originX = geotransform[0]
 		originY = geotransform[3]
 		pixelWidth = geotransform[1]
 		pixelHeight = geotransform[5]
 	
-		print "origin x: %i" %originX
-		print "origin y: %i" %originY
-		print "width: %2.2f" %pixelWidth
-		print "height: %2.2f" %pixelHeight
+		print("origin x: %i" %originX)
+		print("origin y: %i" %originY)
+		print("width: %2.2f" %pixelWidth)
+		print("height: %2.2f" %pixelHeight)
 	
 		# Set pixel offset.....
-		print '~~~~~~~~~~~~~~' 
-		print 'Convert image to 2D array'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~' )
+		print('Convert image to 2D array')
+		print('~~~~~~~~~~~~~~')
 		band = inDs.GetRasterBand(1)
 		image_array = band.ReadAsArray(0, 0, cols, rows)
 		image_array_name = file_name
-		print type(image_array)
-		print image_array.shape
+		print(type(image_array))
+		print(image_array.shape)
 		
 		return image_array, [geotransform, inDs, cols, rows, bands, originX, originY, pixelWidth, pixelHeight,image_array_name]
 
@@ -160,46 +160,46 @@ def ENVI_raster_binary_to_2d_array_COMPACT(file_name):
 	inDs = gdal.Open(file_name, GA_ReadOnly)
 	
 	if inDs is None:
-		print "Couldn't open this file: " + file_name
-		print '\nPerhaps you need an ENVI .hdr file? A quick way to do this is to just open the binary up in ENVI and one will be created for you.'
+		print("Couldn't open this file: " + file_name)
+		print('\nPerhaps you need an ENVI .hdr file? A quick way to do this is to just open the binary up in ENVI and one will be created for you.')
 		sys.exit("Try again!")
 	else:
-		print "%s opened successfully" %file_name
+		print("%s opened successfully" %file_name)
 			
-		print '~~~~~~~~~~~~~~'
-		print 'Get image size'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get image size')
+		print('~~~~~~~~~~~~~~')
 		cols = inDs.RasterXSize
 		rows = inDs.RasterYSize
 		bands = inDs.RasterCount
 	
-		print "columns: %i" %cols
-		print "rows: %i" %rows
-		print "bands: %i" %bands
+		print("columns: %i" %cols)
+		print("rows: %i" %rows)
+		print("bands: %i" %bands)
 	
-		print '~~~~~~~~~~~~~~'
-		print 'Get georeference information'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get georeference information')
+		print('~~~~~~~~~~~~~~')
 		geotransform = inDs.GetGeoTransform()
 		originX = geotransform[0]
 		originY = geotransform[3]
 		pixelWidth = geotransform[1]
 		pixelHeight = geotransform[5]
 	
-		print "origin x: %i" %originX
-		print "origin y: %i" %originY
-		print "width: %2.2f" %pixelWidth
-		print "height: %2.2f" %pixelHeight
+		print("origin x: %i" %originX)
+		print("origin y: %i" %originY)
+		print("width: %2.2f" %pixelWidth)
+		print("height: %2.2f" %pixelHeight)
 	
 		# Set pixel offset.....
-		print '~~~~~~~~~~~~~~' 
-		print 'Convert image to 2D array'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~' )
+		print('Convert image to 2D array')
+		print('~~~~~~~~~~~~~~')
 		band = inDs.GetRasterBand(1)
 		image_array = band.ReadAsArray(0, 0, cols, rows)
 		image_array_name = file_name
-		print type(image_array)
-		print image_array.shape
+		print(type(image_array))
+		print(image_array.shape)
 		
 		return [geotransform, inDs, cols, rows, bands, originX, originY, pixelWidth, pixelHeight, image_array, image_array_name]
 
@@ -218,46 +218,46 @@ def ENVI_raster_binary_to_2d_array(file_name):
 	inDs = gdal.Open(file_name, GA_ReadOnly)
 	
 	if inDs is None:
-		print "Couldn't open this file: " + file_name
-		print '\nPerhaps you need an ENVI .hdr file? A quick way to do this is to just open the binary up in ENVI and one will be created for you.'
+		print("Couldn't open this file: " + file_name)
+		print('\nPerhaps you need an ENVI .hdr file? A quick way to do this is to just open the binary up in ENVI and one will be created for you.')
 		sys.exit("Try again!")
 	else:
-		print "%s opened successfully" %file_name
+		print("%s opened successfully" %file_name)
 			
-		print '~~~~~~~~~~~~~~'
-		print 'Get image size'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get image size')
+		print('~~~~~~~~~~~~~~')
 		cols = inDs.RasterXSize
 		rows = inDs.RasterYSize
 		bands = inDs.RasterCount
 	
-		print "columns: %i" %cols
-		print "rows: %i" %rows
-		print "bands: %i" %bands
+		print("columns: %i" %cols)
+		print("rows: %i" %rows)
+		print("bands: %i" %bands)
 	
-		print '~~~~~~~~~~~~~~'
-		print 'Get georeference information'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~')
+		print('Get georeference information')
+		print('~~~~~~~~~~~~~~')
 		geotransform = inDs.GetGeoTransform()
 		originX = geotransform[0]
 		originY = geotransform[3]
 		pixelWidth = geotransform[1]
 		pixelHeight = geotransform[5]
 	
-		print "origin x: %i" %originX
-		print "origin y: %i" %originY
-		print "width: %2.2f" %pixelWidth
-		print "height: %2.2f" %pixelHeight
+		print("origin x: %i" %originX)
+		print("origin y: %i" %originY)
+		print("width: %2.2f" %pixelWidth)
+		print("height: %2.2f" %pixelHeight)
 	
 		# Set pixel offset.....
-		print '~~~~~~~~~~~~~~' 
-		print 'Convert image to 2D array'
-		print '~~~~~~~~~~~~~~'
+		print('~~~~~~~~~~~~~~' )
+		print('Convert image to 2D array')
+		print('~~~~~~~~~~~~~~')
 		band = inDs.GetRasterBand(1)
 		image_array = band.ReadAsArray(0, 0, cols, rows)
 		image_array_name = file_name
-		print type(image_array)
-		print image_array.shape
+		print(type(image_array))
+		print(image_array.shape)
 		
 		return geotransform, inDs, cols, rows, bands, originX, originY, pixelWidth, pixelHeight, image_array, image_array_name
 
@@ -280,7 +280,7 @@ def xy_dimensions_Geotransform_update(geotransform, image_in_x_px, image_in_y_px
 	Recalculates xy dimensions of an image following resampling 
 	- prior step to outputting a resampled array as a binary
 	'''		
-	print "Updating pixelHeight and Width values"
+	print("Updating pixelHeight and Width values")
 	pixelWidth_original = geotransform[1]
 	pixelHeight_original = geotransform[5]
 	pixel_width_new_image = (image_in_x_px * pixelWidth_original) / new_x_px ## gives pixel size in metres
@@ -327,7 +327,7 @@ def ENVI_raster_binary_from_2d_array(envidata, file_out, post, image_array):
 	new_geotransform = outDs.GetGeoTransform()
 	new_projection = outDs.GetProjection()
 	
-	print "Output binary saved: ", file_out
+	print("Output binary saved: ", file_out)
 	
 	return new_geotransform,new_projection,file_out
 
@@ -364,7 +364,7 @@ def ARC_ASCII_from_2d_array(original_geotransform, inds, file_out, post, image_a
 	new_geotransform = outDs.GetGeoTransform()
 	new_projection = outDs.GetProjection()
 	
-	print "Output binary saved: ", file_out
+	print("Output binary saved: ", file_out)
 
 
 def tiff_back_from_2d_array(tiffdata, file_out, post, image_array):
@@ -404,7 +404,7 @@ def tiff_back_from_2d_array(tiffdata, file_out, post, image_array):
 	new_geotransform = outDs.GetGeoTransform()
 	new_projection = outDs.GetProjection()
 	
-	print "Output binary saved: ", file_out
+	print("Output binary saved: ", file_out)
 	
 	return new_geotransform,new_projection,file_out
 
@@ -485,7 +485,7 @@ def tiff_from_array_SET_GEO_INFO(geotransform, file_out, image_array, cols, rows
 	outband = outRaster.GetRasterBand(1)
 	outband.WriteArray(image_array)
 
-	print "Output tiff created: ", file_out
+	print("Output tiff created: ", file_out)
 
 	#return new_geotransform,new_projection,file_out
 	
@@ -504,7 +504,7 @@ def tiff_from_array(file_out, image_array, cols, rows):
 	outband = outRaster.GetRasterBand(1)
 	outband.WriteArray(image_array)
 
-	print "Output tiff created: ", file_out
+	print*("Output tiff created: ", file_out)
 
 def subset_raster_to_extent_of_other(src_filename, match_filename, dst_filename):
 	"""
@@ -700,7 +700,7 @@ def tiff_from_2d_array(original_dataset, file_out, post, image_array):
 	new_geotransform = outDs.GetGeoTransform()
 	new_projection = outDs.GetProjection()
 	
-	print "Output binary saved: ", file_out
+	print("Output binary saved: ", file_out)
 	
 	#return new_geotransform,new_projection,file_out
 
