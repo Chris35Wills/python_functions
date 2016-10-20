@@ -109,8 +109,8 @@ class grid:
 			bl_xc=self.bl_x+(self.pixelWidth/2)
 			bl_yc=self.bl_y+(self.pixelWidth/2)
 			
-			tr_xc=bl_xc+(self.pixelWidth*(self.nx-1))
-			tr_yc=bl_yc+(self.pixelWidth*(self.ny-1))
+			tr_xc=bl_xc+(self.pixelWidth*(self.nx))
+			tr_yc=bl_yc+(self.pixelWidth*(self.ny))
 			
 			x=np.arange(bl_xc,tr_xc,self.pixelWidth)
 			y=np.arange(tr_yc,bl_yc,-self.pixelWidth)
@@ -124,13 +124,13 @@ class grid:
 			print("Input tl corner x: ", self.tl_x)
 			print("Centre corner x: ", tl_xc)
 			print("Input tl corner y: ", self.tl_y)
-			print("Centre corner x: ", tl_yc) 
+			print("Centre corner y: ", tl_yc) 
 
-			tr_xc=tl_xc+(self.pixelWidth*(self.nx-1))
-			bl_yc=tl_yc-(self.pixelWidth*(self.ny-1)) 
+			tr_xc=tl_xc+(self.pixelWidth*(self.nx))
+			bl_yc=tl_yc-(self.pixelWidth*(self.ny)) 
 
-			x=np.arange(tl_xc,tr_xc,self.pixelWidth)
-			y=np.arange(tl_yc,bl_yc,-self.pixelWidth)
+			x=np.arange(tl_xc,tr_xc,self.pixelWidth) # goes 1 cell less than tr_xc which is fine 
+			y=np.arange(tl_yc,bl_yc,-self.pixelWidth) # as otherwise you've the centre of the next cell off grid
 
 		xv, yv = np.meshgrid(x, y)
 
