@@ -117,14 +117,14 @@ class grid:
 		
 		elif self.corner=='top_left':
 
-			print("Pixel size: ", pixelWidth)
-			print("Input tl corner x: ", )
-			print("Centre corner x: ", )
-			print("Input tl corner y: ",)
-			print("Centre corner x: ", ) 
-
 			tl_xc=self.tl_x+(self.pixelWidth/2) 
 			tl_yc=self.tl_y-(self.pixelWidth/2)
+
+			print("Pixel size: ", self.pixelWidth)
+			print("Input tl corner x: ", self.tl_x)
+			print("Centre corner x: ", tl_xc)
+			print("Input tl corner y: ", self.tl_y)
+			print("Centre corner x: ", tl_yc) 
 
 			tr_xc=tl_xc+(self.pixelWidth*(self.nx-1))
 			bl_yc=tl_yc-(self.pixelWidth*(self.ny-1)) 
