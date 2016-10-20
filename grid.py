@@ -1,3 +1,16 @@
+"""
+Various gridding functions - creating meshes etc.
+
+Attempts to minimize confusion/mis-calculation with regard to grid dimensions set based on cell corner coordinates or cell centre coordinates.
+
+TESTING: test_grid.py
+"""
+
+__author__ = "Chris Wiliams"
+__email__ = "chris.neil.wills@gmail.com"
+__date__ = "19th October 2016"
+__version__ = "1.0"
+
 import sys
 import numpy as np
 
@@ -5,9 +18,10 @@ print("Grid Version: 1.3 imported")
 
 class grid:
 	"""
-	Creates a meshgrid 
+	Various features extending from input grid dimensions.
 
 	Requires user to input corner x and y coordinates and x and y dimensions
+	
 	Coordinates are set as the OUTERMOST LEFT CORNER 
 		i.e. lower_left = coordinate is the lower left corner of the pixel
 		i.e. top_left = coordinate is the top left corner of the pixel
@@ -116,36 +130,3 @@ class grid:
 
 		return xv[::-1], yv[::-1]
 
-################
-# testing...
-"""
-import grid
-
-px=50
-nx=6
-ny=16
-ll_x=-800
-ll_y=-1000
-tl_x=-800
-tl_y=-200
-
-ll=grid.grid(ll_x,ll_y,nx,ny,px,corner='lower_left')
-tl=grid.grid(tl_x, tl_y, nx, ny, px, corner='top_left')
-
-
-# corner mesh
-# check the same
-ll_corner=ll.cell_corner_mesh()
-tl_corner=tl.cell_corner_mesh()
-
-assert tl_corner[0]==ll_corner[0]
-assert tl_corner[1]==ll_corner[1]
-
-# centre mesh
-# check the same
-ll_centre=ll.cell_centre_mesh()
-tl_centre=tl.cell_centre_mesh()
-
-assert tl_centre[0]==ll_centre[0]
-assert tl_centre[1]==ll_centre[1]
-"""
