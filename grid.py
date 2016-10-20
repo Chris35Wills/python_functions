@@ -113,7 +113,7 @@ class grid:
 			tr_yc=bl_yc+(self.pixelWidth*(self.ny-1))
 			
 			x=np.arange(bl_xc,tr_xc,self.pixelWidth)
-			y=np.arange(bl_yc,tr_yc,self.pixelWidth)
+			y=np.arange(tr_yc,bl_yc,self.pixelWidth)
 		
 		elif self.corner=='top_left':
 
@@ -130,7 +130,7 @@ class grid:
 			bl_yc=tl_yc-(self.pixelWidth*(self.ny-1)) 
 
 			x=np.arange(tl_xc,tr_xc,self.pixelWidth)
-			y=np.arange(bl_yc,tl_yc,self.pixelWidth)
+			y=np.arange(tl_yc,bl_yc,self.pixelWidth)
 
 		xv, yv = np.meshgrid(x, y)
 
