@@ -48,11 +48,11 @@ class grid:
 			raise RuntimeError
 
 		if corner=='lower_left':
-			self.bl_x=x # corner_y
-			self.bl_y=y # corner_x
+			self.bl_x=x # corner_x
+			self.bl_y=y # corner_y
 		elif corner =='top_left':
-			self.tl_x=x # corner_y
-			self.tl_y=y # corner_x
+			self.tl_x=x # corner_x
+			self.tl_y=y # corner_y
 
 		self.nx=nx
 		self.ny=ny
@@ -117,11 +117,17 @@ class grid:
 		
 		elif self.corner=='top_left':
 
+			print("Pixel size: ", pixelWidth)
+			print("Input tl corner x: ", )
+			print("Centre corner x: ", )
+			print("Input tl corner y: ",)
+			print("Centre corner x: ", ) 
+
 			tl_xc=self.tl_x+(self.pixelWidth/2) 
 			tl_yc=self.tl_y-(self.pixelWidth/2)
 
-			tr_xc=tl_xc+(self.pixelWidth*(self.nx))
-			bl_yc=tl_yc-(self.pixelWidth*(self.ny)) 
+			tr_xc=tl_xc+(self.pixelWidth*(self.nx-1))
+			bl_yc=tl_yc-(self.pixelWidth*(self.ny-1)) 
 
 			x=np.arange(tl_xc,tr_xc,self.pixelWidth)
 			y=np.arange(bl_yc,tl_yc,self.pixelWidth)
