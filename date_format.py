@@ -31,8 +31,8 @@ def change_date_format(date_arr, input_format="jd", output_format="iso"):
 	"""
 
 	
-	t=time.Time(date_arr, format='input_format')
-	t.format='output_format'
+	t=time.Time(date_arr, format=input_format)
+	t.format=output_format
 	
 	return t
 
