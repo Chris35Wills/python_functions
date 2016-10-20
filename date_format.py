@@ -15,6 +15,7 @@ except ImportError:
 	sys.exit("You need to install the astropy module")
 
 
+
 def change_date_format(date_arr, input_format="jd", output_format="iso"):
 	"""
 	Takes in an array of dates (default: julian day) and retunrs them in a different format (default: TimeISO)
@@ -30,11 +31,14 @@ def change_date_format(date_arr, input_format="jd", output_format="iso"):
 	dates=time_jd_to_timeISO(df['date'].values)
 	"""
 
-	
+	# add check to see if date array is actually dates!
+
 	t=time.Time(date_arr, format=input_format)
 	t.format=output_format
 	
-	return t
+	return t # returns a Time object
+
+
 
 if __name__ == "__main__":
-	print("Run from import")
+	print("Run date_format from import")
