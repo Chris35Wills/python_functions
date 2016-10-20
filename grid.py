@@ -109,8 +109,8 @@ class grid:
 			bl_xc=self.bl_x+(self.pixelWidth/2)
 			bl_yc=self.bl_y+(self.pixelWidth/2)
 			
-			tr_xc=bl_xc+(self.pixelWidth*(self.nx))
-			tr_yc=bl_yc+(self.pixelWidth*(self.ny))
+			tr_xc=bl_xc+(self.pixelWidth*(self.nx-1))
+			tr_yc=bl_yc+(self.pixelWidth*(self.ny-1))
 			
 			x=np.arange(bl_xc,tr_xc,self.pixelWidth)
 			y=np.arange(bl_yc,tr_yc,self.pixelWidth)
