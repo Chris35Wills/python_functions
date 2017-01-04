@@ -18,9 +18,9 @@ def check_output_dir(filename):
 	'''
 	dirname = os.path.dirname(filename)
 	if not os.path.isdir(dirname):	
-		print "%s DOESN'T exist...\n" % dirname
+		print("%s DOESN'T exist...\n" % dirname)
 		os.makedirs(dirname) 
-		print "...but it does now"
+		print("...but it does now")
 
 
 def open_raster(raster_path):
