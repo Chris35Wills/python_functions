@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib
-import georaster as geo
+import georaster as geo # https://github.com/atedstone/georaster
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.colors as colors
 
