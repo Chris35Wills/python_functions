@@ -74,7 +74,7 @@ def diff_plot(ax, z_array, extent,  contour_min, contour_max, contour_interval=1
 
 	return ax
 
-def plot_it(ras1, ras2, contour_min=-800, countour_max=800, unq_nan=-1.6999999999999999e+308, ofile='./diff_plot_temp.png', save_it=False):
+def plot_it(ras1, ras2, contour_min=-800, contour_max=800, unq_nan=-1.6999999999999999e+308, ofile='./diff_plot_temp.png', save_it=False):
 	'''
 	Creates a difference plot where positive values occur where ras1 > ras2
 	Assumes projected coordinates (northing and easting) in metres
@@ -128,15 +128,18 @@ def plot_it(ras1, ras2, contour_min=-800, countour_max=800, unq_nan=-1.699999999
 		print("Saving plot")
 		#plt.savefig(ofile, figsize=(3, 5), transparent=True, dpi=300, format='pdf')
 	else:
-		plt.show(block=False)
+		#plt.show(block=False)
+		plt.show()
 
 
-# EXAMPLE
+if __name__ == "__main__":
+	# EXAMPLE
 
-new_F="C:/analysis_outputs_TEMP/Godthabsfjord_SYNTH_output/out_I_and_II/synth_dem.tif"
-original_F="C:/analysis_outputs_TEMP/Godthabsfjord_SYNTH_output/bamber_2013_dem_to_Godthabsjord_extent.tif"
-ofile="C:/analysis_outputs_TEMP/Godthabsfjord_SYNTH_output/diffPlot.pdf"
+	new_F="./test_images/synth_dem.tif"
+	original_F="./test_images/bamber_2013_dem_to_Godthabsjord_extent.tif"
+	#ofile="C:/temp/test.pdf"#"C:/analysis_outputs_TEMP/Godthabsfjord_SYNTH_output/diffPlot.pdf"
 
-plot_it(ras1=new_F, ras2=original_F, \
-		ofile=ofile, contour_min=-800, countour_max=800, \
-		unq_nan=-1.6999999999999999e+308, save_it=False)
+	plot_it(ras1=new_F, ras2=original_F, \
+			#ofile=ofile, \
+			contour_min=-800, contour_max=800, \
+			unq_nan=-1.6999999999999999e+308, save_it=False)
