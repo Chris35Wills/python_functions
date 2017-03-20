@@ -8,7 +8,7 @@ Various coordinate and gridding related functions
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-import mpl_toolkits.basemap.pyproj as pyproj
+import pyproj
 
 def warp_xyz(xyz, inprj, outprj):
 	"""
@@ -71,6 +71,25 @@ def warp_xyz(xyz, inprj, outprj):
 
 	return xyz_out, xyz_out_transp
 
+def warp_xyz_PANDAS(xyz, inprj, outprj):
+	"""
+
+	Changes coordinates of an input xyz dataset from those specified by inproj to outprj.
+	Appends the transformed x and y as new columns of the input dataframe.
+
+	VARIABLES
+
+	xyz    - xyz (pandas dataframe)
+	inprj  - input projection (proj4 syntax / epsg code)
+	outprj - output projection (proj4 syntax / epsg code)
+	"""
+
+	inprj=pyproj.Proj(inprj)
+	outprj=pyproj.Proj(outprj) 
+	xyz['x_warp'], xyz['y_warp']=pyproj.transform(inprj, outprj, xyz['x'].values, xyz['y'].values)
+
+	return xyz
+
 
 def corners(top_left_x, top_left_y, post, cols, rows):
 	'''
@@ -94,10 +113,10 @@ def corners(top_left_x, top_left_y, post, cols, rows):
 	bl_x = tl_x
 	bl_y = br_y
 
-	print "tl_northing = %f : tl_easting = %f" %(tl_y, tl_x)
-	print "br_northing = %f : br_easting = %f" %(br_y, br_x)
-	print "bl_northing = %f : bl_easting = %f" %(bl_y, bl_x)
-	print "tr_northing = %f : tr_easting = %f" %(tr_y, tr_x)
+	print("tl_northing = %f : tl_easting = %f" %(tl_y, tl_x))
+	print("br_northing = %f : br_easting = %f" %(br_y, br_x))
+	print("bl_northing = %f : bl_easting = %f" %(bl_y, bl_x))
+	print("tr_northing = %f : tr_easting = %f" %(tr_y, tr_x))
 
 	return [tl_x, tl_y], [tr_x, tr_y],[br_x, br_y],[bl_x, bl_y]
 
