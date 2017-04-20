@@ -3,7 +3,7 @@ import matplotlib as mpl
 import matplotlib.cm as cm
 import numpy as np
 
-def colorbar(min_val, max_val, interval, cmap='', label='Elevation (m)', save_it=False, ofile='./TEMP_colorbr.png', dpi=300, disable_rc_overwrite=True, horizontal=True, long_side=8, short_side=3):
+def colorbar(min_val, max_val, interval, cmap='', label='Elevation (m)', save_it=False, ofile='./TEMP_colorbr.png', dpi=300, disable_rc_overwrite=True, horizontal=True, long_side=8, short_side=3, extend_ends='both'):
 	"""
 	Create a colorbar for a given range - can pass in your own custom cmap (must match length of the range you are trying to map though)
 	"""
@@ -35,7 +35,7 @@ def colorbar(min_val, max_val, interval, cmap='', label='Elevation (m)', save_it
 									spacing='uniform', 
 									orientation=orientation, 
 									#boundaries=([-1000] + vals + [2500]), 
-									extend='both', 
+									extend=extend_ends, 
 									ticks=vals)
 		
 	cb.set_label(label, **hfont)

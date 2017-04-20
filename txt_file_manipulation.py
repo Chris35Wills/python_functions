@@ -142,9 +142,9 @@ def check_duplicates(in_file, sep_type="", header_rows=0):
     len_dup_True_indx=len(dup_True[0])
 
     if len_dup_True_indx == 0:
-	print("No duplicated rows in %s" %(in_file))
-    else:	
-	print("%i duplicated rows found in %s" %(len_dup_True_indx, in_file))
+       print("No duplicated rows in %s" %(in_file))
+    else:
+       print("%i duplicated rows found in %s" %(len_dup_True_indx, in_file))
 
 
 def strip_duplicates(in_file, out_file, sep_type="", header_rows=0):
@@ -183,19 +183,19 @@ def strip_duplicates(in_file, out_file, sep_type="", header_rows=0):
     try:
         assert len_no_dup == len_dup_False_indx
     except AssertionError:
-  	print("Removal of duplicates and creation of new output failed.")
-	print("Length of no duplicated indices does not match the subsampled main dataframe... fucntion failiure :(")
+        print("Removal of duplicates and creation of new output failed.")
+        print("Length of no duplicated indices does not match the subsampled main dataframe... function failiure :(")
 
 	
     if header_rows !=0: 
- 	frames = [header, no_dup]
-	no_dup = pd.concat(frames)
+        frames = [header, no_dup]
+        no_dup = pd.concat(frames)
 
     if sep_type=="":
-	no_dup.to_csv(out_file, sep="\t", header=False, index=False)
-	print("Duplicates removed - output file: %s" %(out_file))
+        no_dup.to_csv(out_file, sep="\t", header=False, index=False)
+        print("Duplicates removed - output file: %s" %(out_file))
     else:
- 	no_dup.to_csv(out_file, sep=sep_type, header=False, index=False)
+        no_dup.to_csv(out_file, sep=sep_type, header=False, index=False)
         print("Duplicates removed - output file: %s" %(out_file))
 
 		
