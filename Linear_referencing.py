@@ -23,12 +23,6 @@ def densify(infile, desired_spacing=200., projection=pyproj.Proj("+init=EPSG:432
 	Takes in a set of xy points (make sure they are sorted) and, treating the points as a continuous path, 
 	adds additional points between them to achieve a more desirable point spacing.
 	
-	INPUTS:
-	
-	
-	OUTPUTS:
-	
-	
 	Modifed from A.Tedstone
 	This version: Chris Williams
 	@date: 03/03/16
@@ -62,15 +56,9 @@ def densify(infile, desired_spacing=200., projection=pyproj.Proj("+init=EPSG:432
 			plt.scatter(coords[i,0],coords[i,1],label=point)
 			plt.draw()
 			time.sleep(0.05)
+			
+	ux,uy = xx,yy
 		
-	if projection.is_latlong():
-		print("converting to gridded xy")
-		ux,uy = pyproj.transform(wgs84, gridded_prj, coords[:,0].values,coords[:,1].values)
-		#plt.scatter(ux,uy), plt.title("input xy converted to gridded projection"), plt.show()
-	else:
-		ux,uy = xx,yy
-		#plt.scatter(ux,uy), plt.title("input xy points"), plt.show()
-
 	# Create additional points according to existing point spacing
 	# and user set desired sample spacing
 	transects=[None]*len(ux)
